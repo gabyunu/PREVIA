@@ -2,7 +2,6 @@ from fastapi import FastAPI, Query
 
 from previa.catalog import COURSES
 from previa.schemas import Course
-import os
 
 app = FastAPI(title="PREVIA API", version="0.1.0")
 
