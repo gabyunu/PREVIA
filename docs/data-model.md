@@ -3,6 +3,18 @@
 **Recomendado, no aprobado ni implementado.** Alineado con D01–D06 confirmadas; mecanismos técnicos recomendados y pendientes institucionales D07–D13
 se distinguen en planning-review.md. No es DDL ejecutable.
 
+## Implementación parcial autorizada H02-A
+
+Las nueve tablas académicas y de identidad básica se implementaron en H02-A,
+con FK compuestas y restricciones descritas aquí. El resto del documento conserva
+el diseño recomendado para futuras entregas. Se añadieron a `malla_asignatura`
+`estado_regla`, `revision_pendiente`, `prerrequisito_texto_original` y
+`condiciones_externas` para preservar incertidumbre curricular del piloto.
+Las condiciones externas textuales no sustituyen aristas de prerrequisitos internos.
+La malla se carga como borrador no oficial; no se implementan publicaciones,
+evaluación, escrituras de perfil ni autenticación. Véase
+[detalle y límites de H02-A](h02-a-persistence.md).
+
 ## Convenciones y propósito
 
 Proponer InnoDB, claves primarias enteras, claves foráneas explícitas, texto utf8mb4,

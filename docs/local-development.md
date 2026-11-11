@@ -1,5 +1,9 @@
 # Ejecución local en Ubuntu — H01
 
+La configuración de persistencia incorporada en H02-A está en la
+[guía MySQL, migraciones y carga](h02-a-persistence.md). Las menciones siguientes
+a ausencia de configuración o SQLAlchemy describen exclusivamente H01.
+
 ## Requisitos
 
 Usar Python 3.14 con soporte `venv`, Node.js compatible con Angular 22 y npm.
