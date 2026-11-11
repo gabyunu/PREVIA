@@ -1,0 +1,23 @@
+# Secrets and configuration
+.env
+.env.*
+!.env.example
+
+# Python
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+*.py[cod]
+
+# JavaScript / Angular
+node_modules/
+dist/
+.angular/
+coverage/
+
+# Local data and editor
+.vscode/
+.idea/
+*.log
+.DS_Store
