@@ -13,6 +13,12 @@ y Python 3.14. Véase [evidencia de H01](h01-verification.md). Esta autorizació
 reemplaza la pendiente de inicio únicamente para H01. H02 y los demás hitos
 siguen pendientes de autorización; la fase 1 completa no está cerrada.
 
+H01-B fue autorizado específicamente para migrar la referencia visual anterior
+a Angular 22. Se implementaron cinco vistas de demostración con datos sintéticos
+y estado en memoria, sin integración API ni persistencia. Véase la
+[entrega H01-B](h01-b-migration.md), incluida la revisión visual manual pendiente.
+Esto no autoriza H02 ni las funcionalidades de los hitos posteriores.
+
 ## Fase 0 — Documentación y diseño
 
 Entregables: requirements.md y decisions.md con estatus explícito; planning-review.md,

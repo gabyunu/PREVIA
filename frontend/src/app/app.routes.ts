@@ -1,4 +1,10 @@
 import { Routes } from '@angular/router';
-import { Home } from './features/home/home';
-
-export const routes: Routes = [{ path: '', component: Home }];
+import { Demo } from './demo/demo';
+export const routes: Routes = [
+  { path: '', component: Demo, pathMatch: 'full' },
+  ...['seleccion', 'mi-seleccion', 'historial', 'demanda'].map((path) => ({
+    path,
+    component: Demo,
+  })),
+  { path: '**', redirectTo: '' },
+];
