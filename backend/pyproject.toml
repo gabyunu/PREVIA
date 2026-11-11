@@ -3,7 +3,7 @@ name = "previa-backend"
 version = "0.1.0"
 description = "API local de PREVIA"
 requires-python = ">=3.14,<3.15"
-dependencies = ["fastapi>=0.120,<1", "pydantic>=2.12,<3", "uvicorn>=0.38,<1"]
+dependencies = ["fastapi>=0.120,<1", "pydantic>=2.12,<3", "uvicorn>=0.38,<1", "SQLAlchemy>=2.0.44,<2.1", "alembic>=1.17,<2", "PyMySQL[rsa]>=1.1.2,<2"]
 
 [project.optional-dependencies]
 dev = ["pytest>=8.4,<10", "httpx>=0.28,<1", "ruff>=0.14,<1"]

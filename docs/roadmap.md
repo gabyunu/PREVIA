@@ -19,6 +19,16 @@ y estado en memoria, sin integración API ni persistencia. Véase la
 [entrega H01-B](h01-b-migration.md), incluida la revisión visual manual pendiente.
 Esto no autoriza H02 ni las funcionalidades de los hitos posteriores.
 
+## H02-A — autorización específica y entrega
+
+El usuario autorizó H02-A: MySQL local, SQLAlchemy/Alembic, tablas base de catálogo
+y perfiles y carga de las 53 asignaturas provisionales. Esta subdivisión incorpora
+únicamente persistencia inicial de las áreas H03/H04; no autoriza sus servicios,
+APIs ni evaluador, tampoco H02-B ni autenticación. Véase
+[operación y evidencia H02-A](h02-a-persistence.md). Las referencias anteriores a
+H02 pendiente se conservan como contexto de la planificación original; la autorización
+actual se limita a H02-A. La fase 1 completa no está cerrada.
+
 ## Fase 0 — Documentación y diseño
 
 Entregables: requirements.md y decisions.md con estatus explícito; planning-review.md,
