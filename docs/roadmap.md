@@ -6,6 +6,13 @@
 D01–D06 ya están confirmadas funcionalmente. Una revisión documental
 completa no autoriza avanzar automáticamente. No trabajar todas las fases a la vez.
 
+## Estado de ejecución
+
+H01 fue autorizado por el usuario y se implementó de forma local con Angular 22
+y Python 3.14. Véase [evidencia de H01](h01-verification.md). Esta autorización
+reemplaza la pendiente de inicio únicamente para H01. H02 y los demás hitos
+siguen pendientes de autorización; la fase 1 completa no está cerrada.
+
 ## Fase 0 — Documentación y diseño
 
 Entregables: requirements.md y decisions.md con estatus explícito; planning-review.md,

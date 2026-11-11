@@ -21,3 +21,10 @@ coverage/
 .idea/
 *.log
 .DS_Store
+
+# Packaging and temporary files
+*.egg-info/
+build/
+*.tsbuildinfo
+*.swp
+*~
