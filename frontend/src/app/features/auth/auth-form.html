@@ -1,0 +1,36 @@
+<div class="form-content">
+  <p>{{ registration() ? 'Registro exclusivo para estudiantes.' : 'Accede con tu correo institucional.' }}</p>
+  <p id="api-note" class="availability"><strong>Interfaz en preparación.</strong> La API aún no está disponible. No se envían correos ni se crean cuentas o sesiones.</p>
+  @if (!otpPreview()) {
+    <form #emailForm="ngForm" (ngSubmit)="requestCode()">
+      <label for="institutional-email">Correo institucional</label>
+      <input id="institutional-email" name="email" type="email" autocomplete="email" required email [(ngModel)]="email" #emailField="ngModel" aria-describedby="email-help api-note" />
+      <p id="email-help" class="help">Usa un correo del dominio autorizado por tu institución. Los dominios admitidos están pendientes de configuración.</p>
+      @if (emailField.invalid && (emailField.dirty || emailField.touched)) {
+        <p class="field-error" role="alert">Introduce un correo electrónico válido.</p>
+      }
+      <button type="submit" [disabled]="emailForm.invalid">Solicitar código</button>
+    </form>
+    <button class="preview-link" type="button" (click)="previewCode()">▸ Vista previa del paso OTP</button>
+  } @else {
+    <h2>Paso 2 · Código por correo</h2>
+    <p>En el flujo definitivo introducirás aquí el código recibido en tu correo institucional.</p>
+    <form #otpForm="ngForm" (ngSubmit)="verifyCode()">
+      <label for="otp-code">Código de un solo uso</label>
+      <input id="otp-code" name="code" type="text" autocomplete="one-time-code" required [(ngModel)]="code" aria-describedby="otp-help api-note" />
+      <p id="otp-help" class="help">Vista previa sin envío. El formato y la vigencia del código están pendientes de definición técnica.</p>
+      <button type="submit" [disabled]="otpForm.invalid">Verificar código</button>
+      <button class="preview-link" type="button" (click)="requestCode()">Solicitar otro código (requiere API)</button>
+    </form>
+    <button class="preview-link" type="button" (click)="back()">▸ Volver al correo</button>
+  }
+  <p class="feedback" role="status" aria-live="polite">{{ message() }}</p>
+  <div class="form-links">
+    @if (registration()) {
+      <a routerLink="/iniciar-sesion">▸ Ya tengo cuenta</a>
+    } @else {
+      <a routerLink="/crear-cuenta">▸ Crear cuenta de estudiante</a>
+    }
+    <a routerLink="/">▸ Volver a Inicio</a>
+  </div>
+</div>

@@ -614,3 +614,7 @@ aside > button.active {
     max-width: 100%;
   }
 }
+
+/* H01-C: controles exclusivos de Demanda. */
+.demand-toolbar { flex-wrap: wrap; }
+.demand-toolbar input { width: min(310px, 100%); }

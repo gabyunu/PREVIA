@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink, RouterLinkActive } from '@angular/router';
 import { DEMO_COURSES } from './demo-data';
 import { DemoState } from './demo-state';
+import { Demand } from './demand';
 import { Home } from '../features/home/home';
 
 @Component({
   selector: 'app-demo',
-  imports: [FormsModule, DecimalPipe, RouterLink, RouterLinkActive, Home],
+  imports: [FormsModule, DecimalPipe, RouterLink, RouterLinkActive, Home, Demand],
   templateUrl: './demo.html',
 })
 export class Demo {

@@ -1,0 +1,12 @@
+:host { display: flex; flex-direction: column; min-height: 100vh; }
+.auth-layout { display: grid; grid-template-columns: 265px minmax(0, 1fr); flex: 1; min-height: 580px; }
+.auth-layout aside { display: block; padding-top: 14px; }
+aside h1 { font-size: 13px; font-weight: bold; margin: 0; padding: 7px 10px; border: 1px solid #adc2d2; background: linear-gradient(#fff, #ccd9e2); color: #305c7b; }
+main { background: linear-gradient(#d9e4ea, #fff 75%); padding: 28px 30px; }
+.subnav .auth-caption { margin-left: 0; display: block; color: #315972; }
+@media (max-width: 760px) {
+  .auth-layout { grid-template-columns: 1fr; }
+  main { padding: 20px 14px; }
+  .utilities { display: none; }
+  .brand { margin-top: 12px; }
+}

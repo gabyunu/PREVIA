@@ -1,0 +1,12 @@
+:host { display: block; max-width: 790px; }
+.presentation { border: 1px solid #9aaeb8; border-radius: 6px 6px 14px 14px; background: #fff; overflow: hidden; }
+.panel-top { height: 23px; border-bottom: 1px solid #9aaeb8; background: linear-gradient(#d4dfe0, #eff3f3, #c6d2d6); }
+.intro { padding: 24px 30px 30px; background: linear-gradient(110deg, #f8fafb 45%, #dce8ee); border-bottom: 1px solid #9aaeb8; }
+.eyebrow { font-size: 11px; letter-spacing: 1.5px; color: #527484; }
+h2 { font: normal 30px Georgia, serif; color: #345963; margin: 16px 0; }
+.lead { font-size: 18px; color: #345963; }
+h3 { margin: 0; padding: 18px 30px; color: #243f4a; font-size: 14px; background: linear-gradient(#fff, #c4d1d3 55%, #97acaf); }
+.details { padding: 6px 30px 20px; }
+h4 { color: #305c7b; font-size: 14px; }
+.scope { border-top: 1px solid #ccd8df; padding-top: 14px; color: #526675; font-size: 12px; }
+@media (max-width: 480px) { .intro, .details { padding-left: 18px; padding-right: 18px; } h2 { font-size: 26px; } }

@@ -1,0 +1,15 @@
+:host { display: block; }
+.form-content { padding: 0 12px 20px; }
+label { display: block; color: #315972; margin: 18px 0 5px; }
+input { display: block; width: 100%; min-width: 0; }
+.help { font-size: 11px; color: #526675; }
+.availability { border-bottom: 1px solid #c4d2db; padding-bottom: 12px; color: #435d6e; }
+.availability strong { display: block; }
+h2 { font-size: 13px; margin-top: 20px; }
+.preview-link { display: block; border: 0; background: transparent; padding: 10px 0; text-align: left; line-height: 1.5; text-decoration: underline; }
+.feedback { color: #36576b; overflow-wrap: anywhere; }
+.feedback:empty { display: none; }
+.field-error { color: #913d2c; }
+.form-links { border-top: 1px solid #c4d2db; margin-top: 14px; padding-top: 10px; }
+a { display: block; color: #175e8d; padding: 6px 0; line-height: 1.5; }
+a:focus-visible { outline: 2px solid #2174af; outline-offset: 2px; }

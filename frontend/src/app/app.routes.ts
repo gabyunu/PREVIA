@@ -6,5 +6,7 @@ export const routes: Routes = [
     path,
     component: Demo,
   })),
+  { path: 'iniciar-sesion', loadComponent: () => import('./features/auth/auth').then((m) => m.Auth) },
+  { path: 'crear-cuenta', loadComponent: () => import('./features/auth/auth').then((m) => m.Auth) },
   { path: '**', redirectTo: '' },
 ];

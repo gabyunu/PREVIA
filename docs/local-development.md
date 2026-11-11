@@ -85,3 +85,12 @@ No hay integración frontend/API todavía; no se requiere configurar CORS.
 SQLAlchemy, MySQL, migraciones, Compose y correo quedan pendientes para los hitos
 correspondientes. Los dominios institucionales, la malla, las fechas y la política
 de privacidad siguen pendientes; H01 no los utiliza ni modifica D01–D06.
+
+## Interfaz visual H01-B
+
+H01-B adapta la referencia visual anterior a Angular 22. Con las dependencias
+existentes basta `cd frontend` y `npm start`; abrir http://127.0.0.1:4200.
+No requiere iniciar el backend. Incluye Inicio, Selección de asignaturas,
+Mi selección, Historial y Demanda. Los datos son sintéticos; los cambios solo
+viven en memoria y se pierden al recargar. No se guardan ni envían solicitudes.
+Véanse [alcance, diferencias y verificaciones](h01-b-migration.md).

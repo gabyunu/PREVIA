@@ -1,0 +1,20 @@
+<a class="skip-link" href="#acceso">Saltar al formulario</a>
+<header>
+  <div class="welcome">Acceso a PREVIA</div>
+  <div class="utilities"><span>Planificación de la demanda académica</span></div>
+  <div class="brand">PREVIA<span>Tu intención cuenta para planificar</span></div>
+  <nav aria-label="Navegación principal">
+    <button routerLink="/">Inicio</button>
+    <button routerLink="/iniciar-sesion" routerLinkActive="active" ariaCurrentWhenActive="page">Iniciar sesión</button>
+    <button routerLink="/crear-cuenta" routerLinkActive="active" ariaCurrentWhenActive="page">Crear cuenta</button>
+  </nav>
+</header>
+<div class="subnav"><span class="auth-caption">Acceso por correo institucional · sin contraseña</span></div>
+<div class="auth-layout">
+  <aside aria-label="Acceso por correo">
+    <h1 id="acceso" tabindex="-1">{{ registration ? 'Crear cuenta' : 'Iniciar sesión' }}</h1>
+    <app-auth-form [registration]="registration" />
+  </aside>
+  <main><app-auth-presentation /></main>
+</div>
+<footer>PREVIA · Planificación de la Demanda Académica · Interfaz de acceso en preparación</footer>

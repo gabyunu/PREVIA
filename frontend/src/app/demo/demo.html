@@ -252,53 +252,7 @@
       <button routerLink="/seleccion">Ir a selección de asignaturas</button>
     }
     @if (path === 'demanda') {
-      <p>
-        Vista de demostración del informe agregado para personal autorizado. La autenticación y los
-        permisos se implementarán en sus hitos correspondientes.
-      </p>
-      <div class="period">
-        <b>DEMO / SIGUIENTE PERÍODO — Demanda declarada sintética</b
-        ><small>Conteos ficticios por prioridad, independientes de tu selección temporal</small>
-      </div>
-      <h2 class="bar">
-        Demanda por asignatura <span>Ejemplo de estudiantes únicos por asignatura</span>
-      </h2>
-      <div class="scroll" role="region" aria-label="Demanda sintética" tabindex="0">
-        <table>
-          <thead>
-            <tr>
-              <th scope="col">Curso</th>
-              <th scope="col">Asignatura</th>
-              <th scope="col">Alta</th>
-              <th scope="col">Media</th>
-              <th scope="col">Baja</th>
-              <th scope="col">Total sintético</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (c of courses; track c.id) {
-              <tr>
-                <td class="code">{{ c.id }}</td>
-                <td>{{ c.name }}</td>
-                <td>{{ c.high }}</td>
-                <td>{{ c.medium }}</td>
-                <td>{{ c.low }}</td>
-                <td>
-                  <b>{{ c.high + c.medium + c.low }}</b>
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-      <p class="tiny">
-        En V1 se contará únicamente la versión enviada y vigente; se excluyen borradores y
-        retiradas. Este ejemplo estático no calcula demanda real.
-      </p>
-      <div class="notice">
-        Demanda declarada con prerrequisitos según autodeclaración: representa interés potencial. No
-        acredita elegibilidad oficial, matrícula activa ni disponibilidad confirmada.
-      </div>
+      <app-demand />
     }
   </main>
 </div>
