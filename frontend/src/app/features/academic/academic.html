@@ -1,0 +1,101 @@
+<div class="notice">
+  <b>Malla piloto provisional y no oficial.</b>
+  Historial académico autodeclarado; no verificado por la universidad. No acredita elegibilidad
+  oficial. Las asignaturas sin declaración tienen estado desconocido.
+</div>
+@if (!auth.user()) {
+  <p>Inicia sesión para consultar y guardar tu perfil académico.</p>
+  <button routerLink="/iniciar-sesion">Iniciar sesión</button>
+}
+@if (error()) {
+  <p class="notice error" role="alert">{{ error() }}</p>
+}
+@if (message()) {
+  <p class="notice success" role="status">{{ message() }}</p>
+}
+@if (auth.user()) {
+  <button (click)="load()" [disabled]="busy()">
+    Recargar perfil desde MySQL (descarta cambios sin guardar)
+  </button>
+  @if (!ready() && !error()) {
+    <p role="status">Cargando perfil académico…</p>
+  }
+}
+@if (auth.user() && ready() && curriculum) {
+  <div class="period">
+    <b>{{ career }}</b>
+    <small
+      >{{ curriculum.codigo_version }} · provisional y no oficial ·
+      {{ curriculum.asignaturas.length }} asignaturas</small
+    >
+  </div>
+  <form (ngSubmit)="save()">
+    <fieldset [disabled]="busy()" style="border: 0; padding: 0; margin: 0">
+      <label for="semestre-declarado">Semestre actual declarado (solo para fines analíticos)</label>
+      <input
+        id="semestre-declarado"
+        name="semestre"
+        type="number"
+        min="1"
+        step="1"
+        required
+        [(ngModel)]="semester"
+      />
+      <p class="tiny">
+        El semestre no asigna aprobaciones automáticamente. Revisión guardada: {{ revision }}.
+      </p>
+      @for (group of groups; track group.semester) {
+        <h2 class="bar">
+          Semestre curricular {{ group.semester }}
+          <span>{{ group.subjects.length }} asignaturas</span>
+        </h2>
+        <div
+          class="scroll"
+          role="region"
+          [attr.aria-label]="'Semestre ' + group.semester"
+          tabindex="0"
+        >
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Código</th>
+                <th scope="col">Asignatura</th>
+                <th scope="col">Estado declarado</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (subject of group.subjects; track subject.malla_asignatura_id) {
+                <tr>
+                  <td class="code">{{ subject.codigo_publicado ?? 'Sin código institucional' }}</td>
+                  <td>{{ subject.nombre_publicado }}</td>
+                  <td>
+                    <select
+                      [name]="'estado-' + subject.malla_asignatura_id"
+                      [attr.aria-label]="'Estado declarado de ' + subject.nombre_publicado"
+                      [ngModel]="states[subject.malla_asignatura_id] ?? ''"
+                      (ngModelChange)="states[subject.malla_asignatura_id] = $event"
+                    >
+                      <option value="">Sin declaración (desconocido)</option>
+                      <option value="aprobada">APROBADA</option>
+                      <option value="reprobada">REPROBADA</option>
+                      <option value="no_cursada">NO CURSADA</option>
+                    </select>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+      <p class="tiny">
+        Guardar reemplaza la declaración completa. Quitar una declaración la devuelve a desconocida
+        y conserva las revisiones anteriores.
+      </p>
+      <div class="actions">
+        <button class="primary" type="submit">
+          {{ busy() ? 'Guardando…' : 'Guardar perfil académico' }}
+        </button>
+      </div>
+    </fieldset>
+  </form>
+}

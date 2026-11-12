@@ -29,7 +29,11 @@
 <div class="subnav">
   <button routerLink="/seleccion">Asignaturas de la malla</button
   ><button routerLink="/mi-seleccion">Mi selección</button
-  ><span class="demo-label">Demostración · datos sintéticos · sin conexión</span>
+  ><span class="demo-label">{{
+    path === 'mi-perfil-academico'
+      ? 'Perfil autodeclarado · MySQL local'
+      : 'Demostración · datos sintéticos · sin conexión'
+  }}</span>
 </div>
 <div class="layout">
   <aside [class.expanded]="menuOpen">
@@ -82,11 +86,16 @@
     @if (auth.message()) {
       <p class="notice" role="status">{{ auth.message() }}</p>
     }
-    <div class="notice">
-      <b>Demostración visual H01-B.</b> Datos sintéticos; no guarda ni envía solicitudes. La
-      selección se pierde al recargar. PREVIA no realiza matrícula, reserva cupos ni asigna horarios
-      o paralelos.
-    </div>
+    @if (path !== 'mi-perfil-academico') {
+      <div class="notice">
+        <b>Demostración visual H01-B.</b> Datos sintéticos; no guarda ni envía solicitudes. La
+        selección se pierde al recargar. PREVIA no realiza matrícula, reserva cupos ni asigna
+        horarios o paralelos.
+      </div>
+    }
+    @if (path === 'mi-perfil-academico') {
+      <app-academic />
+    }
     @if (state.message) {
       <div class="notice success" role="status">{{ state.message }}</div>
     }

@@ -13,11 +13,11 @@ export class AuthService {
   private csrf = '';
   private readonly api = 'http://127.0.0.1:8000/api/v1';
 
-  async call<T>(path: string, body?: unknown): Promise<T> {
+  async call<T>(path: string, body?: unknown, method?: 'PUT'): Promise<T> {
     let response: Response;
     try {
       response = await fetch(this.api + path, {
-        method: body === undefined ? 'GET' : 'POST',
+        method: method ?? (body === undefined ? 'GET' : 'POST'),
         credentials: 'include',
         headers:
           body === undefined
@@ -68,9 +68,7 @@ export class AuthService {
     });
     this.csrf = result.csrf_token;
     this.user.set(result.usuario);
-    this.message.set(
-      'Sesión iniciada. El perfil académico todavía está pendiente de implementación.',
-    );
+    this.message.set('Sesión iniciada.');
   }
 
   async logout() {

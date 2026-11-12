@@ -1,5 +1,18 @@
 # PREVIA — API REST preliminar
 
+## Alcance vigente H04-A
+
+**Confirmado y autorizado:** perfil académico propio con sesión OTP, catálogo de las
+53 asignaturas del piloto, estados autodeclarados y revisiones completas en MySQL.
+Esta autorización sustituye las restricciones históricas de implementación
+únicamente para H04-A. Véase [contrato, verificación y demostración](h04-a-academic-profile.md).
+**Recomendado y adoptado localmente:** control de revisión esperada y bloqueo del
+perfil; lectura excepcional del borrador piloto sin publicarlo.
+**Pendiente:** D11 para cambios de carrera/malla, fuentes oficiales, privacidad
+institucional, elegibilidad, solicitudes, administración y reportes persistidos.
+No se amplía el alcance a esos servicios.
+
+
 ## Alcance específico H02-C
 
 **Confirmado e implementado:** persistencia aditiva de períodos, planificación de

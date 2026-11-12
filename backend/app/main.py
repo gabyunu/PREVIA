@@ -7,6 +7,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app.academic import router as academic_router
 from app.api.routes.health import router as health_router
 from app.auth import router as auth_router
 
@@ -18,10 +19,11 @@ app.add_middleware(
     allow_origins=[os.environ.get("AUTH_FRONTEND_ORIGIN", "http://127.0.0.1:4200")],
     allow_credentials=True,
     expose_headers=["Retry-After"],
-    allow_methods=["GET", "POST"],
+    allow_methods=["GET", "POST", "PUT"],
     allow_headers=["Content-Type", "X-CSRF-Token"],
 )
 app.include_router(auth_router)
+app.include_router(academic_router)
 
 
 @app.exception_handler(RequestValidationError)

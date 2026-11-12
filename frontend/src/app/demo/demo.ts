@@ -6,11 +6,12 @@ import { AuthService } from '../features/auth/auth-service';
 import { DEMO_COURSES } from './demo-data';
 import { DemoState } from './demo-state';
 import { Demand } from './demand';
+import { Academic } from '../features/academic/academic';
 import { Home } from '../features/home/home';
 
 @Component({
   selector: 'app-demo',
-  imports: [FormsModule, DecimalPipe, RouterLink, RouterLinkActive, Home, Demand],
+  imports: [FormsModule, DecimalPipe, RouterLink, RouterLinkActive, Home, Demand, Academic],
   templateUrl: './demo.html',
 })
 export class Demo {
@@ -25,6 +26,7 @@ export class Demo {
     { path: '/seleccion', title: 'Selección de asignaturas' },
     { path: '/mi-seleccion', title: 'Mi selección' },
     { path: '/historial', title: 'Historial' },
+    { path: '/mi-perfil-academico', title: 'Mi perfil académico' },
     { path: '/demanda', title: 'Demanda' },
   ];
   readonly courses = DEMO_COURSES;
