@@ -8,6 +8,7 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     ForeignKeyConstraint,
+    Index,
     Integer,
     MetaData,
     String,
@@ -95,6 +96,8 @@ malla_asignatura = table(
     Column("prerrequisito_texto_original", Text, nullable=False),
     # Solo condiciones externas textuales; las aristas internas son relacionales.
     Column("condiciones_externas", JSON, nullable=False),
+    Column("fuente_regla", Text),
+    Column("regla_revisada_en", DateTime),
     UniqueConstraint("version_malla_id", "asignatura_id"),
     UniqueConstraint("id", "version_malla_id"),
     CheckConstraint("semestre_curricular > 0", name="semestre_positivo"),
@@ -175,5 +178,118 @@ estado_academico_declarado = table(
     ),
     CheckConstraint(
         "estado IN ('aprobada','reprobada','no_cursada')", name="estado_valido"
+    ),
+)
+
+# Identidad H02-B: tablas aditivas; sin cambios en el catálogo académico.
+rol = table("rol", pk(), Column("nombre", String(32), nullable=False, unique=True))
+usuario_rol = table(
+    "usuario_rol",
+    Column("usuario_id", Integer, fk("usuario.id"), primary_key=True),
+    Column("rol_id", Integer, fk("rol.id"), primary_key=True),
+)
+auth_control = table("auth_control", pk())
+limite_auth = table(
+    "limite_auth",
+    Column("clave", String(64), primary_key=True),
+    Column("ventana_en", DateTime, nullable=False),
+    Column("ultimo_en", DateTime, nullable=False),
+    Column("cantidad", Integer, nullable=False),
+)
+desafio_otp = table(
+    "desafio_otp",
+    Column("id", String(64), primary_key=True),
+    Column("correo_normalizado", String(254), nullable=False, index=True),
+    Column("proposito", String(16), nullable=False),
+    Column("codigo_digest", String(64), nullable=False),
+    Column("emitido_en", DateTime, nullable=False),
+    Column("expira_en", DateTime, nullable=False),
+    Column("consumido_en", DateTime),
+    Column("invalidado_en", DateTime),
+    Column("intentos", Integer, nullable=False),
+)
+sesion = table(
+    "sesion",
+    pk(),
+    Column("usuario_id", Integer, fk("usuario.id"), nullable=False),
+    Column("token_digest", String(64), nullable=False, unique=True),
+    Column("csrf_digest", String(64), nullable=False),
+    Column("creado_en", DateTime, nullable=False),
+    Column("ultimo_en", DateTime, nullable=False),
+    Column("expira_en", DateTime, nullable=False),
+    Column("revocado_en", DateTime),
+)
+evento_seguridad = table(
+    "evento_seguridad",
+    pk(),
+    Column("actor_usuario_id", Integer, fk("usuario.id")),
+    Column("tipo", String(40), nullable=False),
+    Column("instante", DateTime, nullable=False),
+    Column("referencia_minima", String(64)),
+)
+
+
+# H02-C: planificación orientativa, nunca oferta ni reserva de cupos.
+periodo_academico = table(
+    "periodo_academico",
+    pk(),
+    Column("identificador", String(64), nullable=False, unique=True),
+    Column("inicio_periodo", DateTime),
+    Column("captura_desde", DateTime, nullable=False),
+    Column("captura_hasta", DateTime, nullable=False),
+    Column("zona_horaria", String(64), nullable=False),
+    Column(
+        "estado_configuracion", String(16), nullable=False, server_default="borrador"
+    ),
+    Column("revision_control", Integer, nullable=False, server_default="1"),
+    CheckConstraint("captura_desde < captura_hasta", name="orden_captura"),
+    CheckConstraint(
+        "inicio_periodo IS NULL OR captura_hasta < inicio_periodo",
+        name="captura_anterior_destino",
+    ),
+    CheckConstraint(
+        "estado_configuracion IN ('borrador','publicado')", name="estado_valido"
+    ),
+    CheckConstraint(
+        "estado_configuracion = 'borrador' OR inicio_periodo IS NOT NULL",
+        name="publicado_con_inicio",
+    ),
+    CheckConstraint("revision_control > 0", name="revision_positiva"),
+)
+planificacion_cupos = table(
+    "planificacion_cupos",
+    pk(),
+    Column("malla_asignatura_id", Integer, fk("malla_asignatura.id"), nullable=False),
+    Column("periodo_id", Integer, fk("periodo_academico.id"), nullable=False),
+    Column("cupos_planificados", Integer),
+    Column(
+        "actualizado_en",
+        DateTime,
+        nullable=False,
+        server_default=text("(UTC_TIMESTAMP())"),
+        onupdate=text("UTC_TIMESTAMP()"),
+    ),
+    Column("responsable_usuario_id", Integer, fk("usuario.id")),
+    UniqueConstraint("malla_asignatura_id", "periodo_id"),
+    CheckConstraint("cupos_planificados >= 0", name="cupos_no_negativos"),
+    Index("ix_planificacion_cupos_periodo_id", "periodo_id"),
+)
+nota_administrativa = table(
+    "nota_administrativa",
+    pk(),
+    Column("planificacion_id", Integer, fk("planificacion_cupos.id"), nullable=False),
+    Column("autor_usuario_id", Integer, fk("usuario.id"), nullable=False),
+    Column("tipo", String(16), nullable=False),
+    Column("contenido", Text, nullable=False),
+    created(),
+    CheckConstraint(
+        "tipo IN ('observacion','propuesta','decision')", name="tipo_valido"
+    ),
+    CheckConstraint("CHAR_LENGTH(TRIM(contenido)) > 0", name="contenido_no_vacio"),
+    Index(
+        "ix_nota_administrativa_planificacion_fecha",
+        "planificacion_id",
+        "creado_en",
+        "id",
     ),
 )

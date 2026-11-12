@@ -1,5 +1,26 @@
 # PREVIA — Plan de verificación
 
+## Alcance específico H02-C
+
+**Confirmado e implementado:** persistencia aditiva de períodos, planificación de
+cupos y notas administrativas, más fuente/fecha de revisión de reglas curriculares.
+La autorización actual se limita a H02-C y conserva H02-A/H02-B; las menciones
+históricas a fase 0 o autorización pendiente no describen esta entrega.
+Véanse [tablas, límites, reportes futuros y evidencia H02-C](h02-c-planning.md).
+Cupos orientativos no constituyen oferta ni condicionan selección; NULL o ausencia
+significa desconocido, cero es explícito. Sin nuevas APIs ni cambios visuales,
+de autenticación o de las 53 asignaturas. Solicitudes y reportes reales siguen
+**pendientes**, al igual que servicios administrativos y datos institucionales.
+
+## Estado de implementación H02-B
+
+El usuario autorizó autenticación **solo local** con OTP, Mailpit, sesiones y
+conexión Angular. Está implementada y verificada según
+[alcance, configuración y evidencia H02-B](h02-b-authentication.md).
+Las notas históricas sobre fase 0, ausencia de endpoints o H02-B pendiente se
+limitan al estado anterior. No se autoriza perfil académico ni hitos posteriores.
+Los dominios oficiales, privacidad/retención y administración siguen pendientes.
+
 **Recomendado.** Son pruebas futuras; no se han ejecutado pytest, Ruff, Angular,
 MySQL ni servicios en fase 0. No hay código aplicativo que verificar. D01–D06 de planning-review.md ya fijan expectativas funcionales. Las recomendaciones locales D07–D13 y
 los pendientes institucionales se distinguen en planning-review.md; mecanismos aún no implementados.

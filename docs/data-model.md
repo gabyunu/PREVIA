@@ -1,7 +1,43 @@
 # PREVIA — Modelo relacional propuesto para MySQL
 
+## Alcance específico H02-C
+
+**Confirmado e implementado:** persistencia aditiva de períodos, planificación de
+cupos y notas administrativas, más fuente/fecha de revisión de reglas curriculares.
+La autorización actual se limita a H02-C y conserva H02-A/H02-B; las menciones
+históricas a fase 0 o autorización pendiente no describen esta entrega.
+Véanse [tablas, límites, reportes futuros y evidencia H02-C](h02-c-planning.md).
+Cupos orientativos no constituyen oferta ni condicionan selección; NULL o ausencia
+significa desconocido, cero es explícito. Sin nuevas APIs ni cambios visuales,
+de autenticación o de las 53 asignaturas. Solicitudes y reportes reales siguen
+**pendientes**, al igual que servicios administrativos y datos institucionales.
+
+## Estado de implementación H02-B
+
+El usuario autorizó autenticación **solo local** con OTP, Mailpit, sesiones y
+conexión Angular. Está implementada y verificada según
+[alcance, configuración y evidencia H02-B](h02-b-authentication.md).
+Las notas históricas sobre fase 0, ausencia de endpoints o H02-B pendiente se
+limitan al estado anterior. No se autoriza perfil académico ni hitos posteriores.
+Los dominios oficiales, privacidad/retención y administración siguen pendientes.
+
 **Recomendado, no aprobado ni implementado.** Alineado con D01–D06 confirmadas; mecanismos técnicos recomendados y pendientes institucionales D07–D13
 se distinguen en planning-review.md. No es DDL ejecutable.
+
+## Extensión implementada H02-C
+
+| Tabla / extensión | Relaciones y controles |
+|---|---|
+| periodo_academico | id; identificador/código único; inicio destino UTC; captura desde/hasta; zona; borrador/publicado; revisión positiva; CHECK de orden y de inicio obligatorio al publicar |
+| planificacion_cupos | FK entrada curricular, período, usuario responsable opcional; UNIQUE(entrada, período); cupos nullable ≥0; actualizado_en UTC |
+| nota_administrativa | FK planificación y autor; tipo observacion/propuesta/decision; contenido no vacío; creado_en UTC; índice cronológico por planificación |
+| malla_asignatura | fuente_regla y regla_revisada_en opcionales, sin alterar los metadatos de incertidumbre existentes |
+
+Las FK nuevas usan RESTRICT. La entrada curricular ya determina asignatura y
+versión; no hay catálogo de oferta ni bloqueo por ausencia de planificación.
+NULL/ausencia de cupos conserva brecha desconocida; cero es planificación explícita.
+Autorización administrativa, validación IANA/publicación y cálculos de reportes
+requieren servicios futuros, conforme al [contrato H02-C](h02-c-planning.md).
 
 ## Implementación parcial autorizada H02-A
 

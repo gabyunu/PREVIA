@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from '../features/auth/auth-service';
 import { DEMO_COURSES } from './demo-data';
 import { DemoState } from './demo-state';
 import { Demand } from './demand';
@@ -13,6 +14,10 @@ import { Home } from '../features/home/home';
   templateUrl: './demo.html',
 })
 export class Demo {
+  readonly auth = inject(AuthService);
+  constructor() {
+    void this.auth.refresh();
+  }
   readonly state = inject(DemoState);
   readonly path = inject(ActivatedRoute).snapshot.routeConfig?.path ?? '';
   readonly tabs = [
