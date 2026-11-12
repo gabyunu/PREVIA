@@ -10,7 +10,9 @@ from fastapi.responses import JSONResponse
 from app.academic import router as academic_router
 from app.api.routes.health import router as health_router
 from app.auth import router as auth_router
+from app.demand import router as demand_router
 from app.drafts import router as drafts_router
+from app.history import router as history_router
 
 app = FastAPI(title="PREVIA", version="0.1.0")
 app.include_router(health_router)
@@ -21,11 +23,13 @@ app.add_middleware(
     allow_credentials=True,
     expose_headers=["Retry-After"],
     allow_methods=["GET", "POST", "PUT"],
-    allow_headers=["Content-Type", "X-CSRF-Token"],
+    allow_headers=["Content-Type", "X-CSRF-Token", "Idempotency-Key"],
 )
 app.include_router(auth_router)
 app.include_router(academic_router)
 app.include_router(drafts_router)
+app.include_router(demand_router)
+app.include_router(history_router)
 
 
 @app.exception_handler(RequestValidationError)

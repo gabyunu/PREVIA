@@ -93,7 +93,9 @@ export class Academic {
     this.message.set('');
     const generation = this.generation;
     try {
-      const result = await this.auth.call<Profile & { mensaje: string }>(
+      const result = await this.auth.call<
+        Profile & { mensaje: string; solicitudes_afectadas: { estado: string }[] }
+      >(
         '/me/academic-profile',
         {
           revision_esperada: this.revision,
@@ -110,7 +112,13 @@ export class Academic {
       );
       if (generation !== this.generation) return;
       this.revision = result.revision;
-      this.message.set(result.mensaje);
+      const invalidated = result.solicitudes_afectadas.some((s) => s.estado === 'invalidada');
+      this.message.set(
+        result.mensaje +
+          (invalidated
+            ? ' Una solicitud enviada requiere revisión por incompatibilidad académica. Corrige el borrador en Mi selección y vuelve a enviar.'
+            : ''),
+      );
     } catch (error) {
       if (generation === this.generation) this.error.set(this.describe(error));
     } finally {

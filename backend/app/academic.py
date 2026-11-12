@@ -221,9 +221,12 @@ def academic(
                         for s in body.estados
                     ],
                 )
+            from app.drafts import revalidate_open
+
+            affected = revalidate_open(conn, student, latest(conn, student))
             result = profile_data(conn, latest(conn, student))
             result.update(
-                mensaje="Perfil académico guardado.", solicitudes_afectadas=[]
+                mensaje="Perfil académico guardado.", solicitudes_afectadas=affected
             )
         elif resource == "profile":
             result = profile_data(conn, revision)

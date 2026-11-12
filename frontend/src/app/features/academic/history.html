@@ -1,0 +1,163 @@
+<p>Solicitudes propias persistidas en MySQL. Datos del piloto; no constituyen matrícula.</p>
+@if (!auth.user()) {
+  <p class="notice">Inicia sesión para consultar tu historial.</p>
+  <a routerLink="/iniciar-sesion">Iniciar sesión</a>
+} @else {
+  <button (click)="load()" [disabled]="loading()">Actualizar historial</button>
+  @if (loading()) {
+    <p role="status">Consultando historial…</p>
+  }
+  @if (error()) {
+    <p class="notice" role="alert">{{ error() }}</p>
+  }
+  @if (page(); as p) {
+    <h2 class="bar">
+      Solicitudes por período <span>{{ p.total }} solicitudes</span>
+    </h2>
+    <div class="scroll" role="region" aria-label="Historial académico" tabindex="0">
+      <table>
+        <thead>
+          <tr>
+            <th>Período</th>
+            <th>Estado</th>
+            <th>Creación</th>
+            <th>Último envío</th>
+            <th>Asignaturas</th>
+            <th>Versión mostrada</th>
+            <th>Consulta</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of p.items; track row.id) {
+            <tr>
+              <td>{{ row.periodo }}</td>
+              <td>
+                {{ label(row.estado) }}<br />
+                @if (row.version_vigente_id) {
+                  <small>Con envío vigente</small>
+                }
+                @if (row.version_trabajo_id) {
+                  <small> · Con borrador</small>
+                }
+              </td>
+              <td>{{ utc(row.creado_en) | date: 'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ (utc(row.enviado_en) | date: 'dd/MM/yyyy HH:mm') ?? '—' }}</td>
+              <td>{{ row.version.numero_asignaturas }}</td>
+              <td>
+                {{ row.version.numero }} · {{ label(row.version.tipo) }} ·
+                {{ label(row.version.estado) }}
+              </td>
+              <td><button (click)="open(row.id)" [disabled]="loading()">Ver versiones</button></td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="7">Todavía no tienes solicitudes guardadas.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <button (click)="load(p.offset - p.limit)" [disabled]="loading() || p.offset === 0">
+      Anterior
+    </button>
+    <span>{{ p.offset + (p.total ? 1 : 0) }}–{{ p.offset + p.items.length }} de {{ p.total }}</span>
+    <button
+      (click)="load(p.offset + p.limit)"
+      [disabled]="loading() || p.offset + p.limit >= p.total"
+    >
+      Siguiente
+    </button>
+  }
+  @if (versions(); as v) {
+    <h2 class="bar">
+      {{ v.solicitud.periodo }} · Versiones <span>{{ v.total }} registros</span>
+    </h2>
+    <p>
+      Los borradores no cuentan para demanda. Una corrección pendiente conserva el envío vigente.
+    </p>
+    <div class="scroll" role="region" aria-label="Historial académico" tabindex="0">
+      <table>
+        <thead>
+          <tr>
+            <th>Versión</th>
+            <th>Tipo</th>
+            <th>Vigencia</th>
+            <th>Registro</th>
+            <th>Envío</th>
+            <th>Asignaturas</th>
+            <th>Consulta</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of v.items; track row.id) {
+            <tr>
+              <td>{{ row.numero }}</td>
+              <td>{{ label(row.tipo) }}</td>
+              <td>{{ label(row.estado) }}</td>
+              <td>{{ utc(row.creado_en) | date: 'dd/MM/yyyy HH:mm' }}</td>
+              <td>{{ (utc(row.enviado_en) | date: 'dd/MM/yyyy HH:mm') ?? '—' }}</td>
+              <td>{{ row.numero_asignaturas }}</td>
+              <td>
+                <button (click)="inspect(v.solicitud.id, row.id)" [disabled]="loading()">
+                  Ver asignaturas
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <button
+      (click)="open(v.solicitud.id, v.offset - v.limit)"
+      [disabled]="loading() || v.offset === 0"
+    >
+      Anterior
+    </button>
+    <span>{{ v.offset + 1 }}–{{ v.offset + v.items.length }} de {{ v.total }}</span>
+    <button
+      (click)="open(v.solicitud.id, v.offset + v.limit)"
+      [disabled]="loading() || v.offset + v.limit >= v.total"
+    >
+      Más versiones
+    </button>
+  }
+  @if (detail(); as d) {
+    <h2 class="bar">{{ d.solicitud.periodo }} · Versión {{ d.version.numero }}</h2>
+    <p>
+      {{ label(d.version.tipo) }} · {{ label(d.version.estado) }} · Malla original #{{
+        d.version.malla_id
+      }}
+      · Revisión académica #{{ d.version.revision_perfil_id }}
+    </p>
+    <p>Registrada: {{ utc(d.version.creado_en) | date: 'dd/MM/yyyy HH:mm' }} · Horas locales.</p>
+    <div class="scroll" role="region" aria-label="Historial académico" tabindex="0">
+      <table>
+        <thead>
+          <tr>
+            <th>Asignatura</th>
+            <th>Semestre curricular</th>
+            <th>Prioridad original</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of d.selecciones; track row.malla_asignatura_id) {
+            <tr>
+              <td>{{ row.nombre }}</td>
+              <td>{{ row.semestre_curricular }}</td>
+              <td>{{ label(row.prioridad) }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="3">Borrador sin asignaturas.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    @for (event of d.version.eventos; track $index) {
+      <p class="event">
+        {{ label(event.tipo) }} · {{ utc(event.registrado_en) | date: 'dd/MM/yyyy HH:mm' }}
+      </p>
+    }
+  }
+}

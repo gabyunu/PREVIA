@@ -1,5 +1,38 @@
 # PREVIA — Registro de decisiones (v0.6)
 
+## Alcance vigente H07 — Historial real
+
+**Confirmado y autorizado:** consulta propia autenticada del historial MySQL por
+período, con paginación de solicitudes y versiones, detalle de prioridades,
+semestres, fechas, eventos y vigencia. Reutiliza tablas e instantáneas H05; no
+modifica OTP, prerrequisitos, Demanda, envío ni vigencia. Sin retiro ni
+reconfirmación. Véase [contrato y evidencia H07](h07-history.md).
+La denominación H07 de esta entrega sustituye solo la numeración del plan antiguo
+que llamaba H07 a revalidación; no autoriza otro alcance.
+**Recomendado y adoptado:** lectura de 10 registros por página (máximo API 50),
+creación de principal inferida de su primera versión existente.
+**Pendiente:** políticas institucionales y revisión visual manual en Firefox.
+
+
+## Alcance vigente H06
+
+**Confirmado y autorizado:** Demanda y CSV administrativos desde solicitudes
+persistidas enviadas y vigentes; separación por período/malla, cupos NULL/cero y
+fixture H01-C independiente. Alta administrativa local explícita y auditada, sin
+promoción pública ni cambios a OTP o D03/D04. Sustituye las restricciones históricas
+sobre reportes pendientes solo para este alcance. Contrato, límites, verificaciones
+y guía Firefox en [h06-demand.md](h06-demand.md). Políticas institucionales y
+recorrido visual manual siguen **pendientes**.
+
+## Alcance vigente H05-B
+
+**Confirmado y autorizado:** envío definitivo propio, consulta y correcciones
+durante captura conforme a D01/D04; versiones y fundamento históricos conservados.
+Idempotencia transaccional adoptada para el piloto. Véase
+[h05-b-submit.md](h05-b-submit.md). Sustituye las restricciones históricas de
+H05-A para este alcance; reportes, retiro/recuperación y políticas institucionales
+siguen pendientes.
+
 ## Alcance vigente H05-A
 
 **Confirmado y autorizado:** selección y borrador propio persistido, sin envío ni

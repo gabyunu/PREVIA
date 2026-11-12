@@ -16,9 +16,15 @@ interface Period {
   identificador: string;
   captura_abierta: boolean;
 }
+interface Version {
+  id: number;
+  selecciones: (Choice & { nombre?: string; semestre_curricular?: number })[];
+}
 interface Saved {
+  estado: string;
+  vigente: Version | null;
   revision_control: number;
-  trabajo: { selecciones: Choice[] };
+  trabajo: Version | null;
 }
 
 @Component({
@@ -38,11 +44,21 @@ export class Selection {
   revision = 0;
   profileRevision = 0;
   query = '';
+  saved = signal<Saved | null>(null);
+  confirming = signal(false);
+  dirty = signal(false);
+  private pending: { key: string; body: unknown } | null = null;
+  get periodName() {
+    return this.periods().find((p) => p.id === +this.periodId)?.identificador;
+  }
   private generation = 0;
   constructor() {
     effect(() => {
       const user = this.auth.user();
       ++this.generation;
+      this.saved.set(null);
+      this.confirming.set(false);
+      this.pending = null;
       this.subjects.set([]);
       this.choices.set([]);
       this.periods.set([]);
@@ -76,11 +92,17 @@ export class Selection {
       this.message.set('Máximo 3 altas y 4 medias/bajas; 7 en total.');
       return;
     }
+    this.dirty.set(true);
+    this.confirming.set(false);
     this.choices.set(next);
     this.message.set('Cambios sin guardar.');
   }
   async load() {
     const generation = ++this.generation;
+    this.saved.set(null);
+    this.pending = null;
+    this.confirming.set(false);
+    this.dirty.set(false);
     this.ready.set(false);
     this.busy.set(true);
     this.message.set('');
@@ -105,7 +127,8 @@ export class Selection {
         if (generation !== this.generation) return;
         if (saved) {
           this.revision = saved.revision_control;
-          this.choices.set(saved.trabajo.selecciones);
+          this.saved.set(saved);
+          this.choices.set(saved.trabajo?.selecciones ?? []);
         }
       } else
         this.message.set('No hay período publicado. Configura uno de DEMOSTRACIÓN en desarrollo.');
@@ -128,17 +151,55 @@ export class Selection {
         {
           revision_esperada: this.revision,
           revision_perfil: this.profileRevision,
-          selecciones: this.choices(),
+          selecciones: this.choices().map(({ malla_asignatura_id, prioridad }) => ({
+            malla_asignatura_id,
+            prioridad,
+          })),
         },
         'PUT',
       );
       if (generation !== this.generation) return;
       this.revision = saved.revision_control;
-      this.choices.set(saved.trabajo.selecciones);
+      this.saved.set(saved);
+      this.dirty.set(false);
+      this.pending = null;
+      this.choices.set(saved.trabajo?.selecciones ?? []);
       this.message.set('Borrador guardado.');
     } catch (error) {
       if (generation === this.generation)
         this.message.set(error instanceof Error ? error.message : 'No se pudo guardar.');
+    } finally {
+      if (generation === this.generation) this.busy.set(false);
+    }
+  }
+  async submit() {
+    if (this.busy() || !this.confirming() || this.dirty() || !this.saved()?.trabajo) return;
+    const generation = this.generation;
+    this.pending ??= {
+      key: crypto.randomUUID(),
+      body: {
+        revision_esperada: this.revision,
+        revision_perfil: this.profileRevision,
+        version_trabajo_id: this.saved()!.trabajo!.id,
+      },
+    };
+    this.busy.set(true);
+    try {
+      await this.auth.call<Saved>(
+        `/me/requests/${this.periodId}/submit`,
+        this.pending.body,
+        'POST',
+        { 'Idempotency-Key': this.pending.key },
+      );
+      if (generation !== this.generation) return;
+      this.pending = null;
+      await this.load();
+      this.message.set(
+        'Solicitud enviada: intención académica registrada. No es matrícula ni reserva de cupo.',
+      );
+    } catch (error) {
+      if (generation === this.generation)
+        this.message.set(error instanceof Error ? error.message : 'No se pudo enviar.');
     } finally {
       if (generation === this.generation) this.busy.set(false);
     }

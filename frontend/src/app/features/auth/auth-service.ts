@@ -13,7 +13,12 @@ export class AuthService {
   private csrf = '';
   private readonly api = 'http://127.0.0.1:8000/api/v1';
 
-  async call<T>(path: string, body?: unknown, method?: 'PUT'): Promise<T> {
+  async call<T>(
+    path: string,
+    body?: unknown,
+    method?: 'PUT' | 'POST',
+    extraHeaders: Record<string, string> = {},
+  ): Promise<T> {
     let response: Response;
     try {
       response = await fetch(this.api + path, {
@@ -23,6 +28,7 @@ export class AuthService {
           body === undefined
             ? {}
             : {
+                ...extraHeaders,
                 'Content-Type': 'application/json',
                 'X-CSRF-Token': this.csrf || this.csrfCookie(),
               },

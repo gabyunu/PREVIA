@@ -303,9 +303,17 @@ solicitud = table(
     Column("estado", String(16), nullable=False, server_default="borrador"),
     Column("revision_control", Integer, nullable=False, server_default="0"),
     Column("version_trabajo_id", Integer),
+    Column("version_vigente_id", Integer),
     UniqueConstraint("estudiante_id", "periodo_id"),
     UniqueConstraint("id", "estudiante_id"),
-    CheckConstraint("estado = 'borrador'", name="estado_h05a"),
+    CheckConstraint(
+        "estado IN ('borrador','enviada','invalidada')", name="estado_h05b"
+    ),
+    CheckConstraint(
+        "(estado = 'enviada' AND version_vigente_id IS NOT NULL) OR "
+        "(estado != 'enviada' AND version_vigente_id IS NULL)",
+        name="vigencia_h05b",
+    ),
     CheckConstraint("revision_control >= 0", name="revision_no_negativa"),
 )
 version_solicitud = table(
@@ -316,6 +324,7 @@ version_solicitud = table(
     Column("numero", Integer, nullable=False),
     Column("revision_perfil_id", Integer, nullable=False),
     Column("version_malla_id", Integer, nullable=False),
+    Column("fundamento", JSON),
     created(),
     UniqueConstraint("solicitud_id", "numero"),
     UniqueConstraint("solicitud_id", "id"),
@@ -356,4 +365,36 @@ detalle_solicitud = table(
         ["malla_asignatura.id", "malla_asignatura.version_malla_id"],
     ),
     CheckConstraint("prioridad IN ('alta','media','baja')", name="prioridad_valida"),
+)
+
+solicitud.append_constraint(
+    ForeignKeyConstraint(
+        ["id", "version_vigente_id"],
+        ["version_solicitud.solicitud_id", "version_solicitud.id"],
+        name="fk_solicitud_vigente",
+        use_alter=True,
+    )
+)
+evento_solicitud = table(
+    "evento_solicitud",
+    pk(),
+    Column("solicitud_id", Integer, nullable=False),
+    Column("version_id", Integer, nullable=False),
+    Column("tipo", String(24), nullable=False),
+    created(),
+    ForeignKeyConstraint(
+        ["solicitud_id", "version_id"],
+        ["version_solicitud.solicitud_id", "version_solicitud.id"],
+    ),
+)
+envio_idempotente = table(
+    "envio_idempotente",
+    pk(),
+    Column("estudiante_id", Integer, fk("perfil_estudiante.id"), nullable=False),
+    Column("periodo_id", Integer, fk("periodo_academico.id"), nullable=False),
+    Column("clave", String(36), nullable=False),
+    Column("huella", String(64), nullable=False),
+    Column("respuesta", JSON, nullable=False),
+    created(),
+    UniqueConstraint("estudiante_id", "periodo_id", "clave"),
 )

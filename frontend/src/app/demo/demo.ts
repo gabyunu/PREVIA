@@ -8,6 +8,7 @@ import { Demand } from './demand';
 import { Eligibility } from '../features/academic/eligibility';
 import { Academic } from '../features/academic/academic';
 import { Selection } from '../features/academic/selection';
+import { History } from '../features/academic/history';
 import { Home } from '../features/home/home';
 
 @Component({
@@ -17,6 +18,7 @@ import { Home } from '../features/home/home';
     RouterLink,
     RouterLinkActive,
     Home,
+    History,
     Demand,
     Academic,
     Eligibility,

@@ -1,23 +1,172 @@
-@let data = stats;
-<p>Informe de demostración para Registro Académico. Solicitudes sintéticas independientes de tu selección temporal. Autenticación y permisos pendientes de sus hitos.</p>
-<div class="period"><b>{{ period }} — Datos sintéticos</b><small>Una carrera piloto sin nombre oficial confirmado · {{ version }} · 53 asignaturas propuestas, no oficiales.</small></div>
-<div class="toolbar demand-toolbar">
-  <label>Buscar asignatura o ID temporal<input type="search" [(ngModel)]="filters.query" /></label>
-  <label>Semestre curricular<select [(ngModel)]="filters.semester"><option value="">Todos</option>@for (s of semesters; track s) {<option [value]="s">{{ s }}</option>}</select></label>
-  <label>Prioridad<select [(ngModel)]="filters.priority"><option value="">Todas</option><option>Alta</option><option>Media</option><option>Baja</option></select></label>
-  <label>Ordenar<select [(ngModel)]="filters.order"><option value="descending">Mayor demanda</option><option value="ascending">Menor demanda</option><option value="name">Asignatura A–Z</option><option value="semester">Semestre curricular</option></select></label>
+<div class="toolbar">
+  <label
+    >Fuente del informe<select [(ngModel)]="demonstration">
+      <option [ngValue]="false">Solicitudes persistidas del piloto</option>
+      <option [ngValue]="true">Demostración sintética H01-C</option>
+    </select></label
+  >
 </div>
-<div class="notice" aria-live="polite"><b>{{ data.students }}</b> estudiantes únicos · <b>{{ data.demanded }}</b> asignaturas con demanda · <b>{{ data.total }}</b> intenciones de asignatura<br />Mayor demanda (incluye empates): {{ data.leaders.join(', ') || 'Sin demanda' }}.<small>Indicadores del universo filtrado. No sumar personas entre asignaturas o semestres.</small></div>
-<div class="toolbar demand-toolbar"><label>Tamaño de grupo de referencia (simulación)<input type="number" min="1" step="1" [(ngModel)]="referenceSize" aria-describedby="group-help" /></label><button (click)="exportCsv()">Exportar estadísticas filtradas CSV</button></div>
-<p id="group-help" class="tiny">Opcional: entero positivo. Grupos orientativos = redondeo hacia arriba de demanda / tamaño. No representa apertura real de grupos ni cupos autorizados. Sin datos de docentes, aulas u horarios.</p>
-@if (referenceSize !== null && !size) {<p class="notice error" role="alert">Introduce un entero positivo seguro. No se calcularán grupos con este valor.</p>}
-<h2 class="bar">Demanda por asignatura <span>{{ data.rows.length }} filas · IDs temporales, no códigos oficiales</span></h2>
-<div class="scroll" role="region" aria-label="Demanda sintética filtrada" tabindex="0"><table>
-<thead><tr><th scope="col">Semestre</th><th scope="col">Asignatura / propuesta curricular</th><th scope="col">Total</th><th scope="col">Alta</th><th scope="col">Media</th><th scope="col">Baja</th><th scope="col">Repetición declarada</th><th scope="col">% alta</th><th scope="col">Grupos orientativos</th></tr></thead>
-<tbody>@for (r of data.rows; track r.course.id_referencia) {
-<tr><td>{{ r.course.semestre_curricular }}</td><td>{{ r.course.asignatura }}<small>{{ r.course.id_referencia }} · Prerrequisitos propuestos: {{ r.course.prerrequisito_texto_original }}</small>@if (r.course.revision_pendiente) {<span class="badge warning">Pendiente de verificar · excluida del conteo</span>}</td><td><b>{{ r.total }}</b></td><td>{{ r.high }}</td><td>{{ r.medium }}</td><td>{{ r.low }}</td><td>{{ r.repeated }}</td><td>{{ r.highPercent | number:'1.0-2' }}%</td><td>{{ groups(r.total) ?? '—' }}</td></tr>
-} @empty {<tr><td colspan="9">No hay asignaturas para estos filtros.</td></tr>}</tbody></table></div>
-<h2 class="bar">Resumen por semestre curricular <span>Mismos filtros que la tabla y el CSV</span></h2>
-<table><thead><tr><th scope="col">Semestre</th><th scope="col">Estudiantes únicos</th><th scope="col">Intenciones de asignatura</th></tr></thead><tbody>@for (s of data.semesters; track s.semester) {<tr><td>{{ s.semester }}</td><td>{{ s.students }}</td><td>{{ s.total }}</td></tr>}</tbody></table>
-<p class="tiny">Solo versiones enviadas y vigentes del fixture. Borradores, retiradas, invalidadas y versiones anteriores excluidos. Repetición = reprobación autodeclarada, sin inferir intentos. Cada estudiante cuenta una vez por asignatura.</p>
-<div class="notice">Confirmado: demanda declarada, no matrícula, elegibilidad oficial ni disponibilidad confirmada. Propuesta: malla piloto y prerrequisitos AND con aprobaciones sintéticas. Pendiente: nombre y versión institucional; cinco reglas «Ninguno identificado»; itinerarios I–IX; Inglés II externo y su asterisco; requisitos de titulación, investigación e integración. Las reglas desconocidas no se consideran cumplidas. No hay envío real ni tasa de participación institucional.</div>
+@if (demonstration) {
+  <app-demand-synthetic />
+} @else {
+  <p>
+    Registro Académico · Solicitudes enviadas y vigentes en MySQL. Acceso administrativo autorizado.
+  </p>
+  <div class="notice">
+    Demanda autodeclarada y provisional. No acredita elegibilidad oficial, matrícula ni
+    disponibilidad. La verificación del correo no certifica condición de estudiante activo. Grupos
+    orientativos: no constituyen oferta académica oficial.
+  </div>
+  <div class="toolbar demand-toolbar">
+    <label
+      >Período<select [(ngModel)]="filters.periodo_id" (ngModelChange)="load()">
+        <option value="">Todos</option>
+        @for (p of options.periodos; track p.id) {
+          <option [value]="p.id">{{ p.identificador }}</option>
+        }
+      </select></label
+    >
+    <label
+      >Versión de malla<select [(ngModel)]="filters.malla_id" (ngModelChange)="load()">
+        <option value="">Todas (filas separadas)</option>
+        @for (m of options.mallas; track m.id) {
+          <option [value]="m.id">{{ m.codigo_version }} · ID {{ m.id }}</option>
+        }
+      </select></label
+    >
+    <label
+      >Buscar asignatura o código<input
+        type="search"
+        [(ngModel)]="filters.q"
+        (ngModelChange)="load()"
+    /></label>
+    <label
+      >Semestre curricular<input
+        type="number"
+        min="1"
+        [(ngModel)]="filters.semestre"
+        (ngModelChange)="load()"
+    /></label>
+    <label
+      >Prioridad<select [(ngModel)]="filters.prioridad" (ngModelChange)="load()">
+        <option value="">Todas</option>
+        <option value="alta">Alta</option>
+        <option value="media">Media</option>
+        <option value="baja">Baja</option>
+      </select></label
+    >
+    <label
+      >Ordenar<select [(ngModel)]="filters.orden" (ngModelChange)="load()">
+        <option value="descending">Mayor demanda</option>
+        <option value="ascending">Menor demanda</option>
+        <option value="name">Asignatura A–Z</option>
+        <option value="semester">Semestre curricular</option>
+      </select></label
+    >
+    <label
+      >Tamaño de grupo de referencia<input
+        type="number"
+        min="1"
+        max="1000000"
+        step="1"
+        [(ngModel)]="filters.tamano_grupo"
+        (ngModelChange)="load()"
+    /></label>
+    <button (click)="load()" [disabled]="busy">Actualizar</button
+    ><button (click)="exportCsv()" [disabled]="busy || !data">
+      Exportar estadísticas filtradas CSV
+    </button>
+  </div>
+  @if (message) {
+    <p class="notice error" role="alert">{{ message }}</p>
+  }
+  @if (busy) {
+    <p role="status">Consultando demanda…</p>
+  }
+  @if (data; as d) {
+    <div class="notice" aria-live="polite">
+      <b>{{ d.estudiantes }}</b> estudiantes únicos participantes ·
+      <b>{{ d.intenciones }}</b> intenciones de asignaturas · <b>{{ d.alta }}</b> prioridad alta ·
+      <b>{{ d.media }}</b> prioridad media · <b>{{ d.baja }}</b> prioridad baja ·
+      <b>{{ d.asignaturas }}</b> asignaturas con demanda<small
+        >Universo filtrado. No sumar participantes entre filas. Generado UTC:
+        {{ d.generado_en }}</small
+      >
+    </div>
+    <h2 class="bar">
+      Demanda por asignatura
+      <span>{{ d.filas.length }} filas · período y versión curricular separados</span>
+    </h2>
+    <div class="scroll" role="region" aria-label="Demanda persistida filtrada" tabindex="0">
+      <table>
+        <thead>
+          <tr>
+            <th>Período</th>
+            <th>Malla</th>
+            <th>Semestre</th>
+            <th>Asignatura</th>
+            <th>Total</th>
+            <th>Alta</th>
+            <th>Media</th>
+            <th>Baja</th>
+            <th>Repetición declarada</th>
+            <th>% alta</th>
+            <th>Cupos planificados</th>
+            <th>Grupos orientativos</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (r of d.filas; track r.periodo_id + ':' + r.malla_id + ':' + r.asignatura_id) {
+            <tr>
+              <td>{{ r.periodo }}</td>
+              <td>{{ r.malla }} · ID {{ r.malla_id }}</td>
+              <td>{{ r.semestre }}</td>
+              <td>
+                {{ r.nombre
+                }}<small>{{ r.codigo ?? 'Sin código publicado' }} · ID {{ r.asignatura_id }}</small>
+              </td>
+              <td>
+                <b>{{ r.total }}</b>
+              </td>
+              <td>{{ r.alta }}</td>
+              <td>{{ r.media }}</td>
+              <td>{{ r.baja }}</td>
+              <td>{{ r.repeticion }}</td>
+              <td>{{ ((100 * r.alta) / r.total).toFixed(2) }}%</td>
+              <td>{{ r.cupos_planificados ?? 'Desconocido' }}</td>
+              <td>{{ r.grupos ?? '—' }}</td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="12">Sin demanda vigente para estos filtros.</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <h2 class="bar">Resumen por semestre curricular <span>Mismos filtros del reporte</span></h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Semestre</th>
+          <th>Estudiantes únicos</th>
+          <th>Intenciones de asignaturas</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (s of d.semestres; track s.semestre) {
+          <tr>
+            <td>{{ s.semestre }}</td>
+            <td>{{ s.estudiantes }}</td>
+            <td>{{ s.intenciones }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    <p class="tiny">
+      Borradores, versiones sustituidas e invalidadas excluidos. Una corrección guardada conserva el
+      envío anterior hasta reenviar. Cupo desconocido no equivale a cero. Grupos = redondeo hacia
+      arriba de demanda / tamaño de referencia; sin reserva de cupos.
+    </p>
+  }
+}

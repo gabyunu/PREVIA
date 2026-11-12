@@ -82,6 +82,17 @@
       </tbody>
     </table>
   </div>
+  <p class="notice">
+    Estado:
+    {{
+      saved()?.estado === 'enviada'
+        ? 'Enviada'
+        : saved()?.estado === 'invalidada'
+          ? 'Requiere revisión: envío invalidado'
+          : 'En borrador'
+    }}
+    · Período: {{ periodName }}
+  </p>
   <h2 class="bar">
     Mi selección <span>{{ choices().length }} asignaturas · revisión {{ revision }}</span>
   </h2>
@@ -147,4 +158,56 @@
       Guardar borrador
     </button>
   </div>
+  <div class="actions">
+    <button
+      class="primary"
+      [disabled]="busy() || !ready() || !open || dirty() || !saved()?.trabajo || !choices().length"
+      (click)="confirming.set(true)"
+    >
+      Enviar solicitud
+    </button>
+  </div>
+  @if (dirty()) {
+    <p class="tiny">Guarda el borrador antes de enviar.</p>
+  }
+  @if (confirming()) {
+    <p class="notice">
+      Revisa el resumen anterior: {{ periodName }}, {{ choices().length }} asignaturas con sus
+      semestres y prioridades. Confirmas una intención académica; no es matrícula ni reserva de
+      cupo.
+    </p>
+    <div class="actions">
+      <button [disabled]="busy()" (click)="confirming.set(false)">Cancelar</button>
+      <button class="primary" [disabled]="busy()" (click)="submit()">Confirmar envío</button>
+    </div>
+  }
+  @if (saved()?.vigente; as sent) {
+    <h2 class="bar">
+      Materias enviadas <span>{{ sent.selecciones.length }} asignaturas</span>
+    </h2>
+    <div class="scroll" role="region" aria-label="Materias enviadas" tabindex="0">
+      <table>
+        <thead>
+          <tr>
+            <th>Asignatura</th>
+            <th>Semestre</th>
+            <th>Prioridad</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (choice of sent.selecciones; track choice.malla_asignatura_id) {
+            <tr>
+              <td>{{ choice.nombre }}</td>
+              <td>{{ choice.semestre_curricular }}</td>
+              <td>{{ choice.prioridad.toUpperCase() }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="tiny">
+      Intención académica autodeclarada y provisional. No es matrícula ni reserva de cupo. Guardar
+      una corrección mantiene este envío hasta confirmar el nuevo.
+    </p>
+  }
 }

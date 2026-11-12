@@ -30,9 +30,11 @@
   <button routerLink="/seleccion">Asignaturas de la malla</button
   ><button routerLink="/mi-seleccion">Mi selección</button
   ><span class="demo-label">{{
-    path === 'mi-perfil-academico' || path === 'asignaturas-habilitadas'
-      ? 'Perfil autodeclarado · MySQL local'
-      : 'Demostración · datos sintéticos · sin conexión'
+    path === 'historial'
+      ? 'Historial propio · MySQL local'
+      : path === 'mi-perfil-academico' || path === 'asignaturas-habilitadas'
+        ? 'Perfil autodeclarado · MySQL local'
+        : 'Demostración · datos sintéticos · sin conexión'
   }}</span>
 </div>
 <div class="layout">
@@ -67,7 +69,10 @@
       }
       <h3>Estado de la selección</h3>
       <div class="aside-state">
-        @if (path === 'seleccion' || path === 'mi-seleccion') {
+        @if (path === 'historial') {
+          <strong>Historial persistido</strong>
+          <p>Solicitudes de tu cuenta por período y versión.</p>
+        } @else if (path === 'seleccion' || path === 'mi-seleccion') {
           <strong>Borrador académico</strong>
           <p>Consulta el resumen de Mi selección.</p>
           <small>Máximo 3 altas y 4 medias/bajas</small>
@@ -92,7 +97,13 @@
     @if (auth.message()) {
       <p class="notice" role="status">{{ auth.message() }}</p>
     }
-    @if (path !== 'mi-perfil-academico' && path !== 'asignaturas-habilitadas' && path !== 'seleccion' && path !== 'mi-seleccion') {
+    @if (
+      path !== 'historial' &&
+      path !== 'mi-perfil-academico' &&
+      path !== 'asignaturas-habilitadas' &&
+      path !== 'seleccion' &&
+      path !== 'mi-seleccion'
+    ) {
       <div class="notice">
         <b>Demostración visual H01-B.</b> Datos sintéticos; no guarda ni envía solicitudes. La
         selección se pierde al recargar. PREVIA no realiza matrícula, reserva cupos ni asigna
@@ -115,19 +126,7 @@
       <app-selection />
     }
     @if (path === 'historial') {
-      <p>
-        Movimientos temporales de esta demostración. No constituyen el historial persistente de
-        solicitudes de V1.
-      </p>
-      <h2 class="bar">
-        Historial de la sesión visual <span>{{ state.events().length }} movimientos</span>
-      </h2>
-      @for (event of state.events(); track $index) {
-        <p class="event">{{ event }}</p>
-      } @empty {
-        <p class="empty">No hay movimientos. Puedes probar la selección de asignaturas.</p>
-      }
-      <button routerLink="/seleccion">Ir a selección de asignaturas</button>
+      <app-history />
     }
     @if (path === 'demanda') {
       <app-demand />

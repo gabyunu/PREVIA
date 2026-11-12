@@ -1,5 +1,24 @@
 # PREVIA — API REST preliminar
 
+## Alcance vigente H06
+
+**Confirmado y autorizado:** Demanda y CSV administrativos desde solicitudes
+persistidas enviadas y vigentes; separación por período/malla, cupos NULL/cero y
+fixture H01-C independiente. Alta administrativa local explícita y auditada, sin
+promoción pública ni cambios a OTP o D03/D04. Sustituye las restricciones históricas
+sobre reportes pendientes solo para este alcance. Contrato, límites, verificaciones
+y guía Firefox en [h06-demand.md](h06-demand.md). Políticas institucionales y
+recorrido visual manual siguen **pendientes**.
+
+## Alcance vigente H05-B
+
+**Confirmado y autorizado:** envío definitivo propio, consulta y correcciones
+durante captura conforme a D01/D04; versiones y fundamento históricos conservados.
+Idempotencia transaccional adoptada para el piloto. Véase
+[h05-b-submit.md](h05-b-submit.md). Sustituye las restricciones históricas de
+H05-A para este alcance; reportes, retiro/recuperación y políticas institucionales
+siguen pendientes.
+
 ## Alcance vigente H05-A
 
 **Confirmado y autorizado:** selección y borrador propio persistido, sin envío ni
