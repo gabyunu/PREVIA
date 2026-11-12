@@ -26,3 +26,14 @@ Lee `docs/requirements.md`, `docs/decisions.md`, `docs/architecture.md` y `docs/
 8. No inventes carreras, mallas curriculares, prerrequisitos, fechas o dominios institucionales; usa datos de demostración etiquetados o declara el bloqueo.
 9. Reporta contradicciones y decisiones pendientes antes de implementarlas.
 10. Al terminar una fase, incluye resumen de archivos modificados, verificaciones ejecutadas y pendientes.
+
+## D03 confirmada — H04-B
+- APROBADA nunca es seleccionable de nuevo.
+- REPROBADA y NO CURSADA solo son seleccionables con todos sus prerrequisitos
+  declarados APROBADA y reglas suficientemente verificadas.
+- Sin declaración de la candidata: bloquear con un motivo claro hasta declarar
+  su estado, aunque sus prerrequisitos estén cumplidos.
+- Prerrequisitos incumplidos, desconocidos o pendientes de verificación bloquean.
+- Distinguir «prerrequisitos cumplidos» de «asignatura habilitada para selección».
+  Ausencia de declaración nunca equivale a NO CURSADA ni a APROBADA.
+- La elegibilidad es autodeclarada y provisional, sin certificación universitaria.

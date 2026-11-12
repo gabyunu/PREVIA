@@ -1,5 +1,12 @@
 # PREVIA — Modelo relacional propuesto para MySQL
 
+## Alcance vigente H05-A
+
+**Confirmado y autorizado:** selección y borrador propio persistido, sin envío ni
+reportes reales. Esta ampliación sustituye las restricciones históricas solo para
+H05-A. Contratos, mecanismos adoptados, evidencia y pendientes en
+[h05-a-drafts.md](h05-a-drafts.md). D03 y límites independientes se conservan.
+
 ## Alcance específico H02-C
 
 **Confirmado e implementado:** persistencia aditiva de períodos, planificación de

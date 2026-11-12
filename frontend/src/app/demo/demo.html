@@ -9,7 +9,7 @@
     }
     <div class="utilities">
       <span>Sistema de Planificación Académica</span
-      ><button routerLink="/mi-seleccion">Mi selección ({{ state.chosen.length }})</button>
+      ><button routerLink="/mi-seleccion">Mi selección</button>
     </div>
   </div>
   <div class="brand">PREVIA<span>Planificación de la demanda académica</span></div>
@@ -30,7 +30,7 @@
   <button routerLink="/seleccion">Asignaturas de la malla</button
   ><button routerLink="/mi-seleccion">Mi selección</button
   ><span class="demo-label">{{
-    path === 'mi-perfil-academico'
+    path === 'mi-perfil-academico' || path === 'asignaturas-habilitadas'
       ? 'Perfil autodeclarado · MySQL local'
       : 'Demostración · datos sintéticos · sin conexión'
   }}</span>
@@ -48,8 +48,8 @@
     <div class="aside-content" id="opciones">
       <h3>Opciones <span>▴</span></h3>
       <label
-        >Período de demostración<select>
-          <option>DEMO / SIGUIENTE PERÍODO</option>
+        >Período académico<select disabled>
+          <option>Consultar en Selección</option>
         </select></label
       >
       <p class="tiny">
@@ -67,9 +67,15 @@
       }
       <h3>Estado de la selección</h3>
       <div class="aside-state">
-        <strong>Demostración en memoria</strong>
-        <p>{{ state.chosen.length }} asignaturas · {{ state.credits }} créditos ficticios</p>
-        <small>{{ state.high }}/3 altas · {{ state.additional }}/4 medias/bajas</small>
+        @if (path === 'seleccion' || path === 'mi-seleccion') {
+          <strong>Borrador académico</strong>
+          <p>Consulta el resumen de Mi selección.</p>
+          <small>Máximo 3 altas y 4 medias/bajas</small>
+        } @else {
+          <strong>Demostración en memoria</strong>
+          <p>{{ state.chosen.length }} asignaturas · {{ state.credits }} créditos ficticios</p>
+          <small>{{ state.high }}/3 altas · {{ state.additional }}/4 medias/bajas</small>
+        }
       </div>
       <h3>Leyenda de la demostración</h3>
       <p class="legend">
@@ -86,12 +92,15 @@
     @if (auth.message()) {
       <p class="notice" role="status">{{ auth.message() }}</p>
     }
-    @if (path !== 'mi-perfil-academico') {
+    @if (path !== 'mi-perfil-academico' && path !== 'asignaturas-habilitadas' && path !== 'seleccion' && path !== 'mi-seleccion') {
       <div class="notice">
         <b>Demostración visual H01-B.</b> Datos sintéticos; no guarda ni envía solicitudes. La
         selección se pierde al recargar. PREVIA no realiza matrícula, reserva cupos ni asigna
         horarios o paralelos.
       </div>
+    }
+    @if (path === 'asignaturas-habilitadas') {
+      <app-eligibility />
     }
     @if (path === 'mi-perfil-academico') {
       <app-academic />
@@ -103,155 +112,7 @@
       <app-home />
     }
     @if (path === 'seleccion' || path === 'mi-seleccion') {
-      <p>
-        Selecciona las asignaturas que tienes intención de cursar en el próximo período académico.
-      </p>
-      <div class="steps">
-        <span class="current">1. Selección de asignaturas</span
-        ><span>2. Revisión de prioridades</span><span>3. Envío de intención (pendiente)</span>
-      </div>
-      <div class="period">
-        <b>DEMO / SIGUIENTE PERÍODO — Malla sintética</b
-        ><small>Interés potencial · no representa oferta académica oficial</small>
-      </div>
-      @if (path === 'seleccion') {
-        <div class="toolbar">
-          <label
-            >Código o nombre de asignatura<input
-              [(ngModel)]="query"
-              placeholder="Ej.: Redes o DEMO302"
-              type="search"
-          /></label>
-          <label
-            >Semestre curricular<select [(ngModel)]="level">
-              <option>Todos</option>
-              <option>1</option>
-              <option>2</option>
-              <option>3</option>
-            </select></label
-          >
-          <button (click)="query = ''; level = 'Todos'">Limpiar filtros</button>
-        </div>
-        <h2 class="bar">
-          Asignaturas de la malla sintética <span>{{ filtered.length }} resultados</span>
-        </h2>
-        <div class="scroll" role="region" aria-label="Asignaturas de demostración" tabindex="0">
-          <table>
-            <thead>
-              <tr>
-                <th scope="col">Selección</th>
-                <th scope="col">Curso</th>
-                <th scope="col">Nombre</th>
-                <th scope="col">Semestre</th>
-                <th scope="col">Créditos</th>
-                <th scope="col">Estado declarado / prerrequisito</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (c of filtered; track c.id) {
-                <tr [class.selected]="state.selection()[c.id]">
-                  <td>
-                    <button
-                      [disabled]="!c.available"
-                      (click)="state.toggle(c.id)"
-                      [attr.aria-label]="
-                        (state.selection()[c.id] ? 'Quitar ' : 'Agregar ') + c.name
-                      "
-                    >
-                      {{
-                        state.selection()[c.id]
-                          ? '✓ Agregada'
-                          : c.available
-                            ? '+ Agregar'
-                            : 'Bloqueada'
-                      }}
-                    </button>
-                  </td>
-                  <td class="code">{{ c.id }}</td>
-                  <td>{{ c.name }}</td>
-                  <td>{{ c.level }}</td>
-                  <td>{{ c.credits | number: '1.2-2' }}</td>
-                  <td>
-                    <span
-                      class="badge"
-                      [class.warning]="!c.available && c.state !== null"
-                      [class.unknown]="c.state === null"
-                      >{{ c.state ?? 'Falta declaración' }}</span><small>{{ c.reason }}</small>
-                  </td>
-                </tr>
-              } @empty {
-                <tr>
-                  <td colspan="6" class="empty">No se encontraron asignaturas con esos filtros.</td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-        <p class="tiny">
-          El ejemplo solo permite agregar materias pendientes con estado conocido y prerrequisitos
-          declarados aprobados. La validación de seguridad en backend corresponde a hitos futuros.
-        </p>
-      }
-      <h2 class="bar">
-        Mi selección
-        <span>{{ state.chosen.length }} asignaturas · {{ state.credits }} créditos ficticios</span>
-      </h2>
-      <div class="scroll" role="region" aria-label="Selección de demostración" tabindex="0">
-        <table>
-          <thead>
-            <tr>
-              <th scope="col">Curso</th>
-              <th scope="col">Asignatura</th>
-              <th scope="col">Créditos</th>
-              <th scope="col">Prioridad</th>
-              <th scope="col">Acción</th>
-            </tr>
-          </thead>
-          <tbody>
-            @for (c of state.chosen; track c.id) {
-              <tr>
-                <td class="code">{{ c.id }}</td>
-                <td>{{ c.name }}</td>
-                <td>{{ c.credits }}</td>
-                <td>
-                  <select
-                    [attr.aria-label]="'Prioridad de ' + c.name"
-                    [ngModel]="state.selection()[c.id]"
-                    (ngModelChange)="
-                      state.priority(c.id, $event); prioritySelect.value = state.selection()[c.id]
-                    "
-                    #prioritySelect
-                  >
-                    <option>Alta</option>
-                    <option>Media</option>
-                    <option>Baja</option>
-                  </select>
-                </td>
-                <td>
-                  <button (click)="state.toggle(c.id)" [attr.aria-label]="'Eliminar ' + c.name">
-                    Eliminar
-                  </button>
-                </td>
-              </tr>
-            } @empty {
-              <tr>
-                <td colspan="5" class="empty">
-                  Tu selección está vacía. Agrega asignaturas desde la malla de demostración.
-                </td>
-              </tr>
-            }
-          </tbody>
-        </table>
-      </div>
-      <p class="tiny">
-        Hasta 3 altas y 4 adicionales medias/bajas; máximo 7 asignaturas. Las altas son opcionales.
-      </p>
-      <div class="actions">
-        <button routerLink="/seleccion">Buscar asignaturas</button
-        ><button class="primary" [disabled]="!state.chosen.length" (click)="state.review()">
-          Revisar selección de demostración ▸
-        </button>
-      </div>
+      <app-selection />
     }
     @if (path === 'historial') {
       <p>

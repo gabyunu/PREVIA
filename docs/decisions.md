@@ -1,5 +1,24 @@
 # PREVIA — Registro de decisiones (v0.6)
 
+## Alcance vigente H05-A
+
+**Confirmado y autorizado:** selección y borrador propio persistido, sin envío ni
+reportes reales. Esta ampliación sustituye las restricciones históricas solo para
+H05-A. Contratos, mecanismos adoptados, evidencia y pendientes en
+[h05-a-drafts.md](h05-a-drafts.md). D03 y límites independientes se conservan.
+
+## Alcance vigente H04-B y ratificación D03
+
+**Confirmado:** consulta de elegibilidad curricular autodeclarada y provisional
+con la última revisión propia. APROBADA no es seleccionable; REPROBADA y
+NO CURSADA requieren todos los prerrequisitos APROBADA y reglas suficientemente
+verificadas. Una candidata sin declaración permanece bloqueada aunque cumpla
+los prerrequisitos. «Prerrequisitos cumplidos» y «habilitada para selección»
+son resultados distintos. Véase [contrato y evidencia H04-B](h04-b-eligibility.md).
+Este alcance sustituye las menciones históricas a elegibilidad pendiente.
+Solicitudes, cambios de malla y certificación institucional siguen fuera de alcance.
+
+
 ## Alcance vigente H04-A
 
 **Confirmado y autorizado:** perfil académico propio con sesión OTP, catálogo de las

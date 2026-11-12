@@ -1,5 +1,12 @@
 # PREVIA — Plan de verificación
 
+## Alcance vigente H05-A
+
+**Confirmado y autorizado:** selección y borrador propio persistido, sin envío ni
+reportes reales. Esta ampliación sustituye las restricciones históricas solo para
+H05-A. Contratos, mecanismos adoptados, evidencia y pendientes en
+[h05-a-drafts.md](h05-a-drafts.md). D03 y límites independientes se conservan.
+
 ## Alcance específico H02-C
 
 **Confirmado e implementado:** persistencia aditiva de períodos, planificación de
@@ -127,3 +134,13 @@ formal: el diagrama y contratos son propuestas de texto, sin generación de cód
   versión/entrada curricular en pantalla y CSV. Reprobada implica repetición
   declarada, no_cursada no; desconocido impide envío. Prioridades y semestres se
   toman del fundamento del envío; no recalcular con perfil actual.
+
+## Casos implementados de cierre H04-B
+
+- Cálculo I APROBADA y Cálculo II sin declaración: prerrequisitos cumplidos,
+  candidata no seleccionable y motivo `declaracion_incompleta`. Guardar una nueva
+  revisión con NO CURSADA o REPROBADA habilita Cálculo II.
+- Concurrencia OTP: dos emisiones simultáneas producen 202/429; dos consumos,
+  200/401, con una identidad y una sesión. Limpieza por ejecución incluso ante
+  aserciones fallidas; ejecución completa sin exclusiones. Véase
+  [evidencia H04-B](h04-b-eligibility.md).

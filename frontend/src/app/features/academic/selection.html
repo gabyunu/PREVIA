@@ -1,0 +1,150 @@
+<p class="notice">
+  Elegibilidad autodeclarada y provisional. Guardar borrador no envía la solicitud ni reserva cupos.
+</p>
+@if (!auth.user()) {
+  <button routerLink="/iniciar-sesion">Iniciar sesión</button>
+} @else {
+  <div class="toolbar">
+    <label
+      >Período académico (cambiar descarta cambios sin guardar)<select
+        [(ngModel)]="periodId"
+        (ngModelChange)="load()"
+        [disabled]="busy()"
+      >
+        @for (period of periods(); track period.id) {
+          <option [ngValue]="period.id">
+            {{ period.identificador }} ·
+            {{ period.captura_abierta ? 'Captura abierta' : 'Captura cerrada' }}
+          </option>
+        }
+      </select></label
+    >
+    <label>Nombre de asignatura<input type="search" [(ngModel)]="query" /></label>
+    <button (click)="load()" [disabled]="busy()">Recargar y descartar cambios</button>
+  </div>
+  @if (busy()) {
+    <p role="status">Procesando…</p>
+  }
+  @if (message()) {
+    <p class="notice" role="status">{{ message() }}</p>
+  }
+  <h2 class="bar">
+    Asignaturas de tu malla <span>{{ rows.length }} resultados</span>
+  </h2>
+  <div class="scroll" role="region" aria-label="Asignaturas disponibles" tabindex="0">
+    <table>
+      <thead>
+        <tr>
+          <th>Selección</th>
+          <th>Asignatura</th>
+          <th>Semestre</th>
+          <th>Elegibilidad</th>
+          <th>Prioridad</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of rows; track row.malla_asignatura_id) {
+          <tr [class.selected]="priority(row.malla_asignatura_id)">
+            <td>
+              <button
+                [disabled]="
+                  busy() ||
+                  !ready() ||
+                  !open ||
+                  (!row.seleccionable && !priority(row.malla_asignatura_id))
+                "
+                (click)="
+                  change(row.malla_asignatura_id, priority(row.malla_asignatura_id) ? '' : 'media')
+                "
+              >
+                {{
+                  priority(row.malla_asignatura_id)
+                    ? 'Quitar'
+                    : row.seleccionable
+                      ? '+ Agregar'
+                      : 'Bloqueada'
+                }}
+              </button>
+            </td>
+            <td>{{ row.nombre }}</td>
+            <td>{{ row.semestre_curricular }}</td>
+            <td>
+              <span class="badge" [class.warning]="!row.seleccionable">{{
+                row.seleccionable ? 'Habilitada' : 'Bloqueada'
+              }}</span>
+              @for (reason of row.motivos; track $index) {
+                <small>{{ reason.mensaje }}</small>
+              }
+            </td>
+            <td>{{ priority(row.malla_asignatura_id).toUpperCase() || '—' }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <h2 class="bar">
+    Mi selección <span>{{ choices().length }} asignaturas · revisión {{ revision }}</span>
+  </h2>
+  <div class="scroll" role="region" aria-label="Resumen del borrador" tabindex="0">
+    <table>
+      <thead>
+        <tr>
+          <th>Asignatura</th>
+          <th>Semestre</th>
+          <th>Prioridad</th>
+          <th>Acción</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (choice of selected; track choice.malla_asignatura_id) {
+          <tr>
+            <td>{{ choice.subject?.nombre }}</td>
+            <td>{{ choice.subject?.semestre_curricular }}</td>
+            <td>
+              <select
+                #prioritySelect
+                [attr.aria-label]="'Prioridad de ' + choice.subject?.nombre"
+                [disabled]="busy() || !ready() || !open || !choice.subject?.seleccionable"
+                [ngModel]="choice.prioridad"
+                (ngModelChange)="
+                  change(choice.malla_asignatura_id, $event);
+                  prioritySelect.value = priority(choice.malla_asignatura_id)
+                "
+              >
+                <option value="alta">ALTA</option>
+                <option value="media">MEDIA</option>
+                <option value="baja">BAJA</option>
+              </select>
+            </td>
+            <td>
+              <button
+                [disabled]="busy() || !ready() || !open"
+                (click)="change(choice.malla_asignatura_id, '')"
+              >
+                Quitar
+              </button>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="4" class="empty">No hay asignaturas seleccionadas.</td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+  <p class="tiny">
+    Hasta 3 altas y 4 medias/bajas; máximo 7. Los límites no se compensan. Recargar descarta cambios
+    sin guardar.
+  </p>
+  <div class="actions">
+    <button routerLink="/mi-perfil-academico">Editar perfil</button>
+    <button
+      class="primary"
+      [disabled]="busy() || !ready() || !open || !profileRevision"
+      (click)="save()"
+    >
+      Guardar borrador
+    </button>
+  </div>
+}

@@ -618,3 +618,12 @@ aside > button.active {
 /* H01-C: controles exclusivos de Demanda. */
 .demand-toolbar { flex-wrap: wrap; }
 .demand-toolbar input { width: min(310px, 100%); }
+
+/* Compatibilidad de las funciones nuevas con la presentación anterior. */
+fieldset { min-inline-size: 0; }
+.welcome > a { color: white; margin-left: 8px; }
+.aside-content > button.active { font-weight: bold; background: #dcebf4; }
+.page-note { color: #3e5d72; font-size: 12px; }
+.info-details { margin: 18px 0; }
+summary { cursor: pointer; color: #175e8d; }
+a:focus-visible, summary:focus-visible { outline: 2px solid #2174af; outline-offset: 3px; }

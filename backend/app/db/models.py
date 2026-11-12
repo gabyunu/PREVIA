@@ -293,3 +293,67 @@ nota_administrativa = table(
         "id",
     ),
 )
+
+# H05-A: versiones inmutables de trabajo; sin envío ni demanda.
+solicitud = table(
+    "solicitud",
+    Column("id", Integer, primary_key=True, autoincrement="ignore_fk"),
+    Column("estudiante_id", Integer, fk("perfil_estudiante.id"), nullable=False),
+    Column("periodo_id", Integer, fk("periodo_academico.id"), nullable=False),
+    Column("estado", String(16), nullable=False, server_default="borrador"),
+    Column("revision_control", Integer, nullable=False, server_default="0"),
+    Column("version_trabajo_id", Integer),
+    UniqueConstraint("estudiante_id", "periodo_id"),
+    UniqueConstraint("id", "estudiante_id"),
+    CheckConstraint("estado = 'borrador'", name="estado_h05a"),
+    CheckConstraint("revision_control >= 0", name="revision_no_negativa"),
+)
+version_solicitud = table(
+    "version_solicitud",
+    pk(),
+    Column("solicitud_id", Integer, nullable=False),
+    Column("estudiante_id", Integer, nullable=False),
+    Column("numero", Integer, nullable=False),
+    Column("revision_perfil_id", Integer, nullable=False),
+    Column("version_malla_id", Integer, nullable=False),
+    created(),
+    UniqueConstraint("solicitud_id", "numero"),
+    UniqueConstraint("solicitud_id", "id"),
+    UniqueConstraint("id", "version_malla_id"),
+    ForeignKeyConstraint(
+        ["solicitud_id", "estudiante_id"], ["solicitud.id", "solicitud.estudiante_id"]
+    ),
+    ForeignKeyConstraint(
+        ["estudiante_id", "revision_perfil_id"],
+        ["revision_perfil.estudiante_id", "revision_perfil.id"],
+    ),
+    ForeignKeyConstraint(
+        ["revision_perfil_id", "version_malla_id"],
+        ["revision_perfil.id", "revision_perfil.version_malla_id"],
+    ),
+    CheckConstraint("numero > 0", name="numero_positivo"),
+)
+solicitud.append_constraint(
+    ForeignKeyConstraint(
+        ["id", "version_trabajo_id"],
+        ["version_solicitud.solicitud_id", "version_solicitud.id"],
+        name="fk_solicitud_trabajo",
+        use_alter=True,
+    )
+)
+detalle_solicitud = table(
+    "detalle_solicitud",
+    Column("version_id", Integer, primary_key=True),
+    Column("malla_asignatura_id", Integer, primary_key=True),
+    Column("version_malla_id", Integer, nullable=False),
+    Column("prioridad", String(8), nullable=False),
+    ForeignKeyConstraint(
+        ["version_id", "version_malla_id"],
+        ["version_solicitud.id", "version_solicitud.version_malla_id"],
+    ),
+    ForeignKeyConstraint(
+        ["malla_asignatura_id", "version_malla_id"],
+        ["malla_asignatura.id", "malla_asignatura.version_malla_id"],
+    ),
+    CheckConstraint("prioridad IN ('alta','media','baja')", name="prioridad_valida"),
+)

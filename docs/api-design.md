@@ -1,5 +1,12 @@
 # PREVIA — API REST preliminar
 
+## Alcance vigente H05-A
+
+**Confirmado y autorizado:** selección y borrador propio persistido, sin envío ni
+reportes reales. Esta ampliación sustituye las restricciones históricas solo para
+H05-A. Contratos, mecanismos adoptados, evidencia y pendientes en
+[h05-a-drafts.md](h05-a-drafts.md). D03 y límites independientes se conservan.
+
 ## Alcance vigente H04-A
 
 **Confirmado y autorizado:** perfil académico propio con sesión OTP, catálogo de las
@@ -179,3 +186,12 @@ paginación/cuerpo/exportación se fijarán con pruebas sintéticas en fases pos
   catálogo. No fusionar filas de versiones distintas; consolidación por equivalencias queda fuera de v1. Formato final sigue recomendado bajo D13.
 - Los límites son independientes: altas≤3, medias+bajas≤4 y total≤7; no transferir
   capacidad no usada de altas. 1+6 y 0+5 se rechazan tanto al guardar como al enviar.
+
+## Implementación local H04-B
+
+El GET de elegibilidad y sus campos adicionales se describen en
+[h04-b-eligibility.md](h04-b-eligibility.md). La consulta es curricular, sin
+dependencia de período ni selección/envío. D03 está ratificada: una candidata sin declaración se bloquea con
+`declaracion_incompleta`, incluso con `prerrequisitos_cumplidos: true`.
+`seleccionable` representa la habilitación final, separada del cumplimiento
+de prerrequisitos.

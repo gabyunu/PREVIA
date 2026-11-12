@@ -2,7 +2,14 @@ import { Routes } from '@angular/router';
 import { Demo } from './demo/demo';
 export const routes: Routes = [
   { path: '', component: Demo, pathMatch: 'full' },
-  ...['seleccion', 'mi-seleccion', 'historial', 'demanda', 'mi-perfil-academico'].map((path) => ({
+  ...[
+    'seleccion',
+    'mi-seleccion',
+    'historial',
+    'demanda',
+    'mi-perfil-academico',
+    'asignaturas-habilitadas',
+  ].map((path) => ({
     path,
     component: Demo,
   })),

@@ -10,6 +10,7 @@ from sqlalchemy import insert, select, update
 
 from app import auth
 from app.db import models as m
+from app.eligibility import evaluate
 
 router = APIRouter(prefix="/api/v1")
 WARNING = (
@@ -96,6 +97,11 @@ def curriculum(request: Request, curriculum_id: int):
     return academic(request, resource="curriculum", curriculum_id=curriculum_id)
 
 
+@router.get("/me/eligibility")
+def get_eligibility(request: Request):
+    return academic(request, resource="eligibility")
+
+
 @router.get("/me/academic-profile")
 def get_profile(request: Request):
     return academic(request)
@@ -124,6 +130,16 @@ def academic(
         if student is None:
             return auth.error(
                 403, "perfil_no_disponible", "Se requiere una cuenta de estudiante."
+            )
+        if resource == "eligibility":
+            revision = latest(conn, student)
+            if not revision:
+                return auth.error(
+                    409, "perfil_requerido", "Guarda primero tu perfil académico."
+                )
+            return JSONResponse(
+                dict(evaluate(conn, revision), advertencia=WARNING, provisional=True),
+                headers={"Cache-Control": "no-store"},
             )
         versions = pilot(conn)
         if len(versions) != 1:

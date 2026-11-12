@@ -6,11 +6,12 @@ import secrets
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
 from datetime import timedelta
+from threading import Barrier
 from urllib.request import urlopen
 
 import pytest
 from fastapi.testclient import TestClient
-from sqlalchemy import func, select, update
+from sqlalchemy import delete, func, insert, select, update
 
 from app import auth
 from app.db import models as m
@@ -326,39 +327,120 @@ def test_mailpit_delivery(identity, monkeypatch):
 REAL_SEND = auth.send_code
 
 
-def test_concurrent_consumption_and_requests(monkeypatch):
-    """Conexiones independientes; conserva identidades sintéticas de prueba."""
-    email = "race-" + secrets.token_hex(12) + "@estudiantes.example.test"
+@pytest.fixture
+def concurrent_identity(monkeypatch):
+    """Conexiones reales; limpieza limitada a esta ejecución, incluso ante fallos."""
+    marker = "h04b-race-" + secrets.token_hex(12)
+    email = marker + "@estudiantes.example.test"
+    engine = make_engine()
     config = auth.Settings()
+    monkeypatch.setattr(auth, "engine", lambda: engine)
     monkeypatch.setattr(auth, "settings", lambda: config)
     messages = []
     monkeypatch.setattr(auth, "send_code", lambda email, code: messages.append(code))
-    ip = "race-" + secrets.token_hex(12)
+
+    def tagged_event(conn, kind, user=None):
+        conn.execute(
+            insert(m.evento_seguridad).values(
+                tipo=kind,
+                actor_usuario_id=user,
+                instante=auth.now(),
+                referencia_minima=marker,
+            )
+        )
+
+    monkeypatch.setattr(auth, "event", tagged_event)
+    keys = [
+        auth.digest(scope + ":" + value)
+        for scope, value in (
+            ("emision_correo", email),
+            ("emision_ip", marker),
+            ("verificacion_ip", marker),
+        )
+    ]
+    try:
+        yield engine, email, marker, messages
+    finally:
+        try:
+            with engine.begin() as conn:
+                uid = conn.scalar(
+                    select(m.usuario.c.id).where(
+                        m.usuario.c.correo_normalizado == email
+                    )
+                )
+                conn.execute(
+                    delete(m.evento_seguridad).where(
+                        m.evento_seguridad.c.referencia_minima == marker
+                    )
+                )
+                if uid is not None:
+                    for table in (m.sesion, m.usuario_rol, m.perfil_estudiante):
+                        conn.execute(delete(table).where(table.c.usuario_id == uid))
+                    conn.execute(delete(m.usuario).where(m.usuario.c.id == uid))
+                conn.execute(
+                    delete(m.desafio_otp).where(
+                        m.desafio_otp.c.correo_normalizado == email
+                    )
+                )
+                conn.execute(
+                    delete(m.limite_auth).where(m.limite_auth.c.clave.in_(keys))
+                )
+            with engine.connect() as conn:
+                for table, condition in (
+                    (m.usuario, m.usuario.c.correo_normalizado == email),
+                    (m.desafio_otp, m.desafio_otp.c.correo_normalizado == email),
+                    (
+                        m.evento_seguridad,
+                        m.evento_seguridad.c.referencia_minima == marker,
+                    ),
+                    (m.limite_auth, m.limite_auth.c.clave.in_(keys)),
+                ):
+                    assert (
+                        conn.scalar(
+                            select(func.count()).select_from(table).where(condition)
+                        )
+                        == 0
+                    )
+        finally:
+            engine.dispose()
+
+
+def test_concurrent_consumption_and_requests(concurrent_identity):
+    engine, email, ip, messages = concurrent_identity
+    barrier = Barrier(2, timeout=10)
 
     def request_code(_):
         with TestClient(app, headers=ORIGIN, client=(ip, 50000)) as client:
+            barrier.wait()
             return client.post("/api/v1/auth/otp/request", json={"correo": email})
 
     with ThreadPoolExecutor(max_workers=2) as pool:
         issued = list(pool.map(request_code, range(2)))
     assert sorted(r.status_code for r in issued) == [202, 429]
+    assert len(messages) == 1
     challenge = next(r for r in issued if r.status_code == 202).json()["desafio_id"]
 
     def consume(_):
         with TestClient(app, headers=ORIGIN, client=(ip, 50000)) as client:
+            barrier.wait()
             return verify(client, challenge, messages[0]).status_code
 
     with ThreadPoolExecutor(max_workers=2) as pool:
         assert sorted(pool.map(consume, range(2))) == [200, 401]
-    with auth.engine().connect() as conn:
-        assert (
-            conn.scalar(
-                select(func.count())
-                .select_from(m.usuario)
-                .where(m.usuario.c.correo_normalizado == email)
-            )
-            == 1
+    with engine.connect() as conn:
+        uid = conn.scalar(
+            select(m.usuario.c.id).where(m.usuario.c.correo_normalizado == email)
         )
+        assert uid is not None
+        for table in (m.sesion, m.perfil_estudiante, m.usuario_rol):
+            assert (
+                conn.scalar(
+                    select(func.count())
+                    .select_from(table)
+                    .where(table.c.usuario_id == uid)
+                )
+                == 1
+            )
 
 
 def test_authentication_failure_rolls_back(identity, monkeypatch):

@@ -1,0 +1,101 @@
+<p class="notice">
+  Elegibilidad autodeclarada y provisional · no certificada por la universidad.
+</p>
+@if (!auth.user()) {
+  <p>Inicia sesión para consultar tus asignaturas habilitadas.</p>
+  <button routerLink="/iniciar-sesion">Iniciar sesión</button>
+} @else {
+  <div class="actions">
+    <button routerLink="/mi-perfil-academico">Editar perfil</button>
+    <button (click)="load()" [disabled]="loading()">Actualizar</button>
+  </div>
+  @if (loading()) {
+    <p role="status">Consultando asignaturas…</p>
+  }
+  @if (error()) {
+    <p class="notice error" role="alert">{{ error() }}</p>
+  }
+  @if (result(); as data) {
+    <p class="tiny">Revisión {{ data.revision_perfil }} · último perfil guardado.</p>
+    @for (group of groups; track group.semester) {
+      <h2 class="bar">
+        Semestre {{ group.semester }}<span>{{ group.rows.length }} asignaturas</span>
+      </h2>
+      <div
+        class="scroll"
+        role="region"
+        [attr.aria-label]="'Semestre ' + group.semester"
+        tabindex="0"
+      >
+        <table>
+          <thead>
+            <tr>
+              <th scope="col">Asignatura</th>
+              <th scope="col">Estado declarado</th>
+              <th scope="col">Elegibilidad</th>
+              <th scope="col">Detalle</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of group.rows; track row.malla_asignatura_id) {
+              <tr>
+                <td>{{ row.nombre }}</td>
+                <td>{{ stateLabel(row.estado_declarado) }}</td>
+                <td>
+                  <span
+                    class="badge"
+                    [class.unknown]="row.estado_declarado === 'aprobada'"
+                    [class.warning]="!row.seleccionable && row.estado_declarado !== 'aprobada'"
+                    >{{ label(row) }}</span
+                  >
+                </td>
+                <td>
+                  <div>
+                    <p>
+                      Prerrequisitos:
+                      {{
+                        row.prerrequisitos_cumplidos
+                          ? 'cumplidos según autodeclaración'
+                          : 'incumplidos o pendientes de verificación'
+                      }}.
+                    </p>
+                    @for (reason of row.motivos; track $index) {
+                      <p>{{ reason.mensaje }}</p>
+                    }
+                    @if (row.advertencia) {
+                      <p>{{ row.advertencia }}</p>
+                    }
+                    @for (condition of row.condiciones_externas; track $index) {
+                      <p>Condición externa: {{ condition }}</p>
+                    }
+                    @for (req of row.prerrequisitos_requeridos; track req.malla_asignatura_id) {
+                      <p>{{ req.nombre }}: {{ stateLabel(req.estado_declarado) }}</p>
+                    } @empty {
+                      <p>
+                        Sin prerrequisitos internos registrados; la habilitación depende también de
+                        la verificación de reglas.
+                      </p>
+                    }
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  }
+}
+
+<div class="notice">
+  <b>Acerca de esta consulta</b>
+  <p>Se evalúa la última revisión guardada. Los cambios sin guardar no se incluyen.</p>
+  <p>
+    Cumplir prerrequisitos no basta: declara también el estado de la candidata. APROBADA no se puede
+    repetir; sin declaración permanece bloqueada.
+  </p>
+  <p>
+    Las reglas sin verificar bloquean la habilitación. Esta consulta no constituye matrícula,
+    reserva de cupos ni oferta confirmada.
+  </p>
+</div>
