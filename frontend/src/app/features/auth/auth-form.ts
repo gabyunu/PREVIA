@@ -10,7 +10,7 @@ import { AuthService } from './auth-service';
   styleUrl: './auth-form.css',
 })
 export class AuthForm {
-  readonly registration = input(false);
+  readonly mode = input<'administrador' | 'estudiante'>('estudiante');
   readonly otpPreview = signal(false);
   readonly message = signal('');
   readonly busy = signal(false);
@@ -18,6 +18,8 @@ export class AuthForm {
   private readonly router = inject(Router);
   private challenge = '';
   email = '';
+  readonly studentDemo = 'estudiante.demo@estudiantes.example.test';
+  readonly adminDemo = 'admin.demo@estudiantes.example.test';
   code = '';
 
   async requestCode() {
@@ -48,9 +50,13 @@ export class AuthForm {
     this.message.set('Verificando código…');
     try {
       await this.auth.verify(this.challenge, this.code);
+      if (this.mode() === 'administrador' ? !this.auth.isAdmin() : !this.auth.isStudent()) {
+        await this.auth.logout();
+        throw new Error('La cuenta no dispone del rol solicitado. Utiliza el correo correspondiente.');
+      }
       this.code = '';
       this.challenge = '';
-      await this.router.navigateByUrl('/');
+      await this.router.navigateByUrl(this.mode() === 'administrador' ? '/panel-administrador' : '/inicio-estudiante');
     } catch (error) {
       this.code = '';
       this.message.set(error instanceof Error ? error.message : 'No se pudo verificar el código.');

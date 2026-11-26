@@ -10,5 +10,7 @@ import { AuthPresentation } from './auth-presentation';
   styleUrl: './auth.css',
 })
 export class Auth {
-  readonly registration = inject(ActivatedRoute).snapshot.routeConfig?.path === 'crear-cuenta';
+  readonly mode: 'administrador' | 'estudiante' =
+    inject(ActivatedRoute).snapshot.routeConfig?.path === 'acceso-administrador'
+      ? 'administrador' : 'estudiante';
 }

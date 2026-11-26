@@ -10,3 +10,7 @@ main { background: linear-gradient(#d9e4ea, #fff 75%); padding: 28px 30px; }
   .utilities { display: none; }
   .brand { margin-top: 12px; }
 }
+.login-intro { max-width: 690px; margin: 45px auto; }
+.login-intro h2 { font-size: 27px; font-weight: 600; }
+.login-intro p { font-size: 14px; }
+.login-intro .notice { font-size: 13px; }

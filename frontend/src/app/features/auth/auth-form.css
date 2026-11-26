@@ -13,3 +13,8 @@ h2 { font-size: 13px; margin-top: 20px; }
 .form-links { border-top: 1px solid #c4d2db; margin-top: 14px; padding-top: 10px; }
 a { display: block; color: #175e8d; padding: 6px 0; line-height: 1.5; }
 a:focus-visible { outline: 2px solid #2174af; outline-offset: 2px; }
+.demo-identity { margin-top: 14px; background: #ecf4f9; border: 1px solid #b7cfdf; border-left: 3px solid #22628e; padding: 12px 10px; }
+.demo-identity strong,.demo-identity code,.demo-identity small { display: block; }
+.demo-identity code { font-size: 11px; overflow-wrap: anywhere; margin: 8px 0; }
+.demo-identity button { margin: 5px 0; }
+.availability a { color: #0f6394; }

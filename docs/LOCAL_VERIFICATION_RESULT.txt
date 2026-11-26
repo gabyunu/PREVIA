@@ -1,0 +1,21 @@
+PREVIA FINAL - VERIFICATION RECORDED IN THE AUTHORING ENVIRONMENT
+Date: 2026-11-22
+
+PASS - Static Python syntax compilation of entire backend (compileall).
+PASS - Generated MySQL DDL from all 24 model tables without compilation errors.
+PASS - Generated SVG and PDF ER diagrams from model foreign keys.
+PASS - Generated and validated OpenAPI JSON and Postman collection JSON.
+PASS - Baseline legacy test suite excluding Flask integration: 1 passed, 81 skipped.
+PASS - PDF project report generated and rendered for visual inspection.
+
+NOT RUN - New Flask/Flask-SQLAlchemy runtime CRUD tests (dependencies could not be
+          installed in the isolated authoring environment; no PyPI network).
+NOT RUN - Angular 22 build (current authoring Node 22.16.0 is below
+          the project's minimum 22.22.3, and no compatible local npm packages).
+NOT RUN - Windows 11 installation script and MySQL Docker integration
+          (the authoring environment is not Windows 11 with Docker Desktop).
+NOT RUN - End-to-end browser GUI and actual MySQL admin CRUD demonstration.
+NOT DONE - GitHub commit/push (the user's uploaded ZIP has no .git metadata).
+
+The earlier 82 green backend tests are historical H07 evidence and do NOT
+validate this new Flask adapter. Execute scripts/windows-tests.ps1 on the laptop.

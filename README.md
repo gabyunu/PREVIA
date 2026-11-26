@@ -1,17 +1,24 @@
-# PREVIA
+# PREVIA — Proyecto final de Bases de Datos
 
-Recoge intención de cursar materias para el siguiente período y permite planificar
-con demanda declarada. No realiza matrícula, reserva cupos ni asigna horarios.
-La verificación futura del correo no certifica matrícula activa.
+**Versión adaptada para Windows 11.** API servida por **Flask** con integración
+**Flask-SQLAlchemy**, frontend **Angular 22** y base de datos **MySQL 8.4**.
 
-H01 implementa únicamente una página Angular y una API FastAPI con `GET /health`.
-No hay autenticación, datos académicos, base de datos ni despliegue.
+## Comenzar
 
-- [Instalación y ejecución local en Ubuntu](docs/local-development.md)
-- [Evidencia y alcance de H01](docs/h01-verification.md)
-- [Requisitos](docs/requirements.md), [decisiones](docs/decisions.md),
-  [arquitectura](docs/architecture.md), [modelo](docs/data-model.md)
-  y [hoja de ruta](docs/roadmap.md)
+- [Instalación desde cero en Windows 11](docs/WINDOWS_11.md)
+- [Informe final del proyecto](docs/FINAL_PROJECT_REPORT.md)
+- [Diagrama entidad-relación y scripts SQL](database/)
+- [Pruebas y evidencia pendiente](docs/VERIFICATION_CHECKLIST.md)
+- [Guion de exposición de 15 minutos](docs/EXPOSICION_15_MIN.md)
+- [Documentación de la API OpenAPI](docs/openapi.json)
+- [Colección Postman](docs/PREVIA_Postman_Collection.json)
 
-Frontend y backend se instalan por separado. El código se creó desde cero.
-H02 necesita autorización independiente.
+La API nueva se ejecuta con `python -m flask --app app.flask_api:app run`.
+El archivo `backend/app/main.py` mantiene el servidor FastAPI anterior
+para compatibilidad de pruebas históricas; no es el punto de entrada de Windows.
+Las funciones históricas siguen usando algunos tipos de FastAPI mediante un adaptador
+HTTP conservador, mientras que el CRUD de administración es nativo Flask-SQLAlchemy.
+
+**El prototipo usa malla y estados autodeclarados, no datos institucionales reales.**
+No matricula estudiantes ni reserva cupos. Este ZIP no modifica GitHub ni incluye
+una copia de la base de datos del equipo anterior.

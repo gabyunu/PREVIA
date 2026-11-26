@@ -1,136 +1,113 @@
 <a class="skip-link" href="#contenido">Saltar al contenido</a>
 <header>
   <div class="welcome">
-    Bienvenido <span>{{ auth.user()?.correo ?? 'Visitante · demostración' }}</span>
+    <span>PREVIA · Sistema de planificación académica</span>
     @if (auth.user()) {
-      <button (click)="auth.logout()">Cerrar sesión</button>
+      <span class="role-pill">{{ auth.isAdmin() ? 'ADMINISTRACIÓN' : 'ESTUDIANTE' }}</span>
+      <span class="account-email">{{ auth.user()?.correo }}</span>
+      <button type="button" (click)="signOut()">Cerrar sesión</button>
     } @else {
-      <a routerLink="/iniciar-sesion">Iniciar sesión</a>
+      <span class="role-pill">ENTORNO LOCAL DE PRUEBA</span>
     }
-    <div class="utilities">
-      <span>Sistema de Planificación Académica</span
-      ><button routerLink="/mi-seleccion">Mi selección</button>
-    </div>
   </div>
-  <div class="brand">PREVIA<span>Planificación de la demanda académica</span></div>
+  <div class="brand">PREVIA<span>Intenciones académicas para una mejor planificación</span></div>
   <nav aria-label="Navegación principal">
-    @for (tab of tabs; track tab.path) {
-      <button
-        [routerLink]="tab.path"
-        routerLinkActive="active"
-        [routerLinkActiveOptions]="{ exact: true }"
-        ariaCurrentWhenActive="page"
-      >
-        {{ tab.title }}
-      </button>
+    @if (auth.isStudent()) {
+      @for (tab of studentTabs; track tab.path) {
+        <button [routerLink]="tab.path" routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page">{{ tab.title }}</button>
+      }
+    } @else if (auth.isAdmin()) {
+      @for (tab of adminTabs; track tab.path) {
+        <button [routerLink]="tab.path" routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }" ariaCurrentWhenActive="page">{{ tab.title }}</button>
+      }
+    } @else {
+      <button routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Inicio</button>
+      <button routerLink="/acceso-estudiante">Acceso estudiante</button>
+      <button routerLink="/acceso-administrador">Acceso administrador</button>
     }
   </nav>
 </header>
 <div class="subnav">
-  <button routerLink="/seleccion">Asignaturas de la malla</button
-  ><button routerLink="/mi-seleccion">Mi selección</button
-  ><span class="demo-label">{{
-    path === 'historial'
-      ? 'Historial propio · MySQL local'
-      : path === 'mi-perfil-academico' || path === 'asignaturas-habilitadas'
-        ? 'Perfil autodeclarado · MySQL local'
-        : 'Demostración · datos sintéticos · sin conexión'
-  }}</span>
+  @if (auth.isAdmin()) {
+    <span>Panel administrativo · Demanda agregada y planificación en MySQL</span>
+    <span>Sin matrículas ni reservas oficiales</span>
+  } @else if (auth.isStudent()) {
+    <span>Área del estudiante · Perfil autodeclarado y selección personal</span>
+    <span>Máximo 3 altas y 4 medias/bajas</span>
+  } @else {
+    <span>Elige el perfil para ingresar al sistema.</span>
+  }
 </div>
-<div class="layout">
-  <aside [class.expanded]="menuOpen">
-    <button
-      class="mobile-options"
-      (click)="menuOpen = !menuOpen"
-      [attr.aria-expanded]="menuOpen"
-      aria-controls="opciones"
-    >
-      Opciones y enlaces {{ menuOpen ? '▴' : '▾' }}
-    </button>
-    <div class="aside-content" id="opciones">
-      <h3>Opciones <span>▴</span></h3>
-      <label
-        >Período académico<select disabled>
-          <option>Consultar en Selección</option>
-        </select></label
-      >
-      <p class="tiny">
-        Malla y perfil ficticios. No representan una institución ni un calendario oficial.
-      </p>
-      <h3>Enlaces <span>▴</span></h3>
-      @for (tab of tabs; track tab.path) {
-        <button
-          [routerLink]="tab.path"
-          routerLinkActive="active"
-          [routerLinkActiveOptions]="{ exact: true }"
-        >
-          {{ tab.title }}
-        </button>
-      }
-      <h3>Estado de la selección</h3>
-      <div class="aside-state">
-        @if (path === 'historial') {
-          <strong>Historial persistido</strong>
-          <p>Solicitudes de tu cuenta por período y versión.</p>
-        } @else if (path === 'seleccion' || path === 'mi-seleccion') {
-          <strong>Borrador académico</strong>
-          <p>Consulta el resumen de Mi selección.</p>
-          <small>Máximo 3 altas y 4 medias/bajas</small>
-        } @else {
-          <strong>Demostración en memoria</strong>
-          <p>{{ state.chosen.length }} asignaturas · {{ state.credits }} créditos ficticios</p>
-          <small>{{ state.high }}/3 altas · {{ state.additional }}/4 medias/bajas</small>
-        }
-      </div>
-      <h3>Leyenda de la demostración</h3>
-      <p class="legend">
-        <span class="dot green"></span> Seleccionable en ejemplo<br /><span
-          class="dot amber"
-        ></span>
-        Prerrequisito pendiente<br /><span class="dot gray"></span> Falta declaración
-      </p>
-      <p class="tiny">Los estados son autodeclarados. No acreditan elegibilidad oficial.</p>
-    </div>
-  </aside>
+<div class="layout" [class.public-layout]="!auth.user()">
+  @if (auth.isStudent()) {
+    <aside class="workspace-sidebar">
+      <h3>MI ESPACIO</h3>
+      <p class="tiny">Accede únicamente a tus declaraciones y solicitudes.</p>
+      <a routerLink="/mi-perfil-academico">Mi perfil académico</a>
+      <a routerLink="/asignaturas-habilitadas">Asignaturas habilitadas</a>
+      <a routerLink="/mi-seleccion">Preparar solicitud</a>
+      <a routerLink="/historial">Mis envíos anteriores</a>
+      <h3>INFORMACIÓN</h3>
+      <p class="tiny">La malla es provisional. PREVIA no realiza matrículas ni reserva cupos.</p>
+    </aside>
+  } @else if (auth.isAdmin()) {
+    <aside class="workspace-sidebar admin-sidebar">
+      <h3>ADMINISTRACIÓN</h3>
+      <p class="tiny">Información agregada de intenciones de estudiantes.</p>
+      <a routerLink="/panel-administrador">Indicadores generales</a>
+      <a routerLink="/demanda">Demanda y exportación CSV</a>
+      <a routerLink="/planificacion">Planificación y CRUD</a>
+      <h3>ALCANCE</h3>
+      <p class="tiny">Los cupos son orientativos. No son plazas disponibles ni aprobadas institucionalmente.</p>
+    </aside>
+  }
   <main id="contenido" tabindex="-1">
-    <h1>{{ title }}</h1>
-    @if (auth.message()) {
-      <p class="notice" role="status">{{ auth.message() }}</p>
-    }
-    @if (
-      path !== 'historial' &&
-      path !== 'mi-perfil-academico' &&
-      path !== 'asignaturas-habilitadas' &&
-      path !== 'seleccion' &&
-      path !== 'mi-seleccion'
-    ) {
-      <div class="notice">
-        <b>Demostración visual H01-B.</b> Datos sintéticos; no guarda ni envía solicitudes. La
-        selección se pierde al recargar. PREVIA no realiza matrícula, reserva cupos ni asigna
-        horarios o paralelos.
-      </div>
-    }
-    @if (path === 'asignaturas-habilitadas') {
-      <app-eligibility />
-    }
-    @if (path === 'mi-perfil-academico') {
-      <app-academic />
-    }
-    @if (state.message) {
-      <div class="notice success" role="status">{{ state.message }}</div>
-    }
-    @if (path === '') {
-      <app-home />
-    }
-    @if (path === 'seleccion' || path === 'mi-seleccion') {
-      <app-selection />
-    }
-    @if (path === 'historial') {
-      <app-history />
-    }
-    @if (path === 'demanda') {
-      <app-demand />
+    @if (!auth.checked()) {
+      <p class="notice" role="status">Verificando sesión...</p>
+    } @else {
+      @if (!auth.user()) {
+        <section class="access-intro">
+          <p class="eyebrow">PORTAL ACADÉMICO · DEMOSTRACIÓN</p>
+          <h1>Dos espacios, una misma base de datos</h1>
+          <p>Accede según tu función. Los estudiantes gestionan sus propias solicitudes; el personal administrador consulta datos agregados y controla la planificación orientativa.</p>
+          <div class="access-cards">
+            <article class="access-card">
+              <div class="access-icon">01</div>
+              <h2>Portal del estudiante</h2>
+              <p>Declara tu historial, consulta las asignaturas habilitadas, prepara una selección y revisa tus envíos.</p>
+              <a class="button-primary" routerLink="/acceso-estudiante">Ingresar como estudiante</a>
+              <small>Sin estadísticas globales ni gestión de cupos</small>
+            </article>
+            <article class="access-card admin-access-card">
+              <div class="access-icon">02</div>
+              <h2>Panel de administración</h2>
+              <p>Revisa intenciones de matrícula, prioridades, materias demandadas y ejecuta operaciones CRUD de planificación.</p>
+              <a class="button-primary" routerLink="/acceso-administrador">Ingresar como administrador</a>
+              <small>Acceso restringido por rol y sesión</small>
+            </article>
+          </div>
+          <p class="disclaimer">Piloto académico con datos de demostración. No realiza matrículas, reservas de cupos ni validaciones institucionales.</p>
+        </section>
+      } @else if (auth.isAdmin()) {
+        <p class="eyebrow">ESPACIO ADMINISTRATIVO</p>
+        <h1>{{ path === '' ? 'Panel de administración' : title }}</h1>
+        @if (path === '' || path === 'panel-administrador') { <app-admin-dashboard /> }
+        @if (path === 'demanda') { <app-demand /> }
+        @if (path === 'planificacion') { <app-admin-planning /> }
+      } @else if (auth.isStudent()) {
+        <p class="eyebrow">ESPACIO DEL ESTUDIANTE</p>
+        <h1>{{ path === '' ? 'Mi espacio académico' : title }}</h1>
+        @if (path === '' || path === 'inicio-estudiante') { <app-home /> }
+        @if (path === 'mi-perfil-academico') { <app-academic /> }
+        @if (path === 'asignaturas-habilitadas') { <app-eligibility /> }
+        @if (path === 'mi-seleccion' || path === 'seleccion') { <app-selection /> }
+        @if (path === 'historial') { <app-history /> }
+      } @else {
+        <p class="notice error">Cuenta sin un rol autorizado. Consulta al administrador del entorno local.</p>
+      }
     }
   </main>
 </div>
-<footer>PREVIA · Planificación de la Demanda Académica · Demostración con datos sintéticos</footer>
+<footer>PREVIA · Piloto local de demanda académica · Sin matrícula ni reserva de cupos</footer>

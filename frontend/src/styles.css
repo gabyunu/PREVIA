@@ -627,3 +627,56 @@ fieldset { min-inline-size: 0; }
 .info-details { margin: 18px 0; }
 summary { cursor: pointer; color: #175e8d; }
 a:focus-visible, summary:focus-visible { outline: 2px solid #2174af; outline-offset: 3px; }
+
+/* H08: differentiated student and administration workspaces. Retains PREVIA blues. */
+.role-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  margin-left: 12px; padding: 3px 9px;
+  border: 1px solid #b6d4e7; border-radius: 100px;
+  color: #f5fbff; background: #14557f; font-size: 10px; letter-spacing: .55px;
+}
+.welcome .account-email { margin-left: 9px; overflow-wrap: anywhere; }
+.welcome > button { margin-left: 12px; background: #f1f7fb; border-color: #8eb1c9; padding: 3px 9px; }
+.eyebrow { color: #376f95; font-size: 10px; font-weight: bold; letter-spacing: 1.8px; text-transform: uppercase; }
+.public-layout { display: block; min-height: 580px; }
+.public-layout main { margin: auto; max-width: 1120px; padding: 30px 24px 50px; }
+.access-intro { padding: 20px 0 30px; }
+.access-intro h1 { max-width: 720px; font-size: clamp(23px, 3vw, 34px); font-weight: bold; line-height: 1.22; border: none; }
+.access-intro > p { max-width: 760px; font-size: 14px; color: #445b6c; }
+.access-cards, .quick-actions, .admin-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 17px; margin: 24px 0; }
+.access-card, .quick-actions article, .admin-actions article { padding: 23px; border: 1px solid #c8d9e5; border-radius: 7px; background: #fff; box-shadow: 0 4px 12px #1b4a6b0e; }
+.access-card h2, .quick-actions h2, .admin-actions h2 { margin-top: 10px; font-size: 19px; }
+.access-card p, .quick-actions p, .admin-actions p { color: #526778; font-size: 13px; min-height: 45px; }
+.access-card small { margin-top: 14px; }
+.access-card.admin-access-card { background: #f2f8fc; border-top: 4px solid #316b92; }
+.access-card:not(.admin-access-card) { border-top: 4px solid #5b8ba8; }
+.access-icon { font-size: 12px; font-weight: bold; color: #39799e; letter-spacing: 2px; }
+a.button-primary { display: inline-block; background: #286589; border: 1px solid #215476; color: white; font-size: 12px; padding: 9px 14px; border-radius: 4px; text-decoration: none; font-weight: bold; }
+a.button-primary:hover { background: #194c6d; }
+.disclaimer { padding-top: 10px; border-top: 1px solid #d7e2ea; }
+.workspace-sidebar { padding-bottom: 24px; }
+.workspace-sidebar a { display: block; color: #285f82; text-decoration: none; padding: 9px 12px; border-bottom: 1px solid #d4e2eb; font-size: 12px; }
+.workspace-sidebar a:hover { background: #dfeef6; }
+.workspace-sidebar h3:not(:first-child) { margin-top: 26px; }
+.admin-sidebar { background: #edf4fa; }
+.quick-actions { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.quick-actions article { padding: 19px; }
+.quick-actions h2 { font-size: 16px; }
+.quick-step { font-size: 10px; font-weight: bold; letter-spacing: 1px; color: #397497; }
+.metric-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 18px 0; }
+.metric-grid article { padding: 15px 14px; background: #f0f7fb; border: 1px solid #c5dce9; border-top: 3px solid #5687a6; border-radius: 5px; min-width: 0; }
+.metric-grid article span { display: block; color: #486778; font-size: 11px; }
+.metric-grid strong { display: block; color: #17577d; font-size: 30px; margin: 6px 0; }
+.metric-grid small { color: #617786; }
+@media (max-width: 1050px) { .metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .quick-actions { grid-template-columns: 1fr; } }
+@media (max-width: 760px) {
+  .welcome .account-email { display: none; }
+  .welcome .role-pill { margin-left: 4px; }
+  .workspace-sidebar { display: none; }
+  .access-cards, .admin-actions, .metric-grid { grid-template-columns: 1fr; }
+  .access-intro { padding-top: 0; }
+  .public-layout main { padding: 16px; }
+  .access-card, .admin-actions article { padding: 18px; }
+  .subnav span { display: block; font-size: 10px; margin: 0; }
+  nav { width: calc(100% - 10px); overflow-x: auto; }
+}

@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { computed, Injectable, signal } from '@angular/core';
 
 export interface AuthUser {
   id: number;
@@ -9,6 +9,9 @@ export interface AuthUser {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   readonly user = signal<AuthUser | null>(null);
+  readonly checked = signal(false);
+  readonly isAdmin = computed(() => this.user()?.roles.length === 1 && this.user()?.roles[0] === 'administrador');
+  readonly isStudent = computed(() => this.user()?.roles.length === 1 && this.user()?.roles[0] === 'estudiante');
   readonly message = signal('');
   private csrf = '';
   private readonly api = 'http://127.0.0.1:8000/api/v1';
@@ -16,22 +19,23 @@ export class AuthService {
   async call<T>(
     path: string,
     body?: unknown,
-    method?: 'PUT' | 'POST',
+    method?: 'PUT' | 'POST' | 'DELETE',
     extraHeaders: Record<string, string> = {},
   ): Promise<T> {
     let response: Response;
+    const httpMethod = method ?? (body === undefined ? 'GET' : 'POST');
+    const writing = httpMethod !== 'GET';
     try {
       response = await fetch(this.api + path, {
-        method: method ?? (body === undefined ? 'GET' : 'POST'),
+        method: httpMethod,
         credentials: 'include',
-        headers:
-          body === undefined
-            ? {}
-            : {
-                ...extraHeaders,
-                'Content-Type': 'application/json',
-                'X-CSRF-Token': this.csrf || this.csrfCookie(),
-              },
+        headers: writing
+          ? {
+              ...extraHeaders,
+              ...(body !== undefined ? { 'Content-Type': 'application/json' } : {}),
+              'X-CSRF-Token': this.csrf || this.csrfCookie(),
+            }
+          : {},
         body: body === undefined ? undefined : JSON.stringify(body),
       });
     } catch {
@@ -61,9 +65,13 @@ export class AuthService {
   async refresh() {
     try {
       this.user.set(await this.call<AuthUser>('/me'));
-    } catch (error) {
+      this.message.set('');
+    } catch {
       this.user.set(null);
-      this.message.set(error instanceof Error ? error.message : 'Sesión no disponible.');
+      // Un visitante sin sesión es normal, no un error de navegación.
+      this.message.set('');
+    } finally {
+      this.checked.set(true);
     }
   }
 
@@ -74,6 +82,7 @@ export class AuthService {
     });
     this.csrf = result.csrf_token;
     this.user.set(result.usuario);
+    this.checked.set(true);
     this.message.set('Sesión iniciada.');
   }
 
@@ -82,6 +91,7 @@ export class AuthService {
       await this.call('/auth/logout', {});
       this.csrf = '';
       this.user.set(null);
+      this.checked.set(true);
       this.message.set('Sesión cerrada.');
     } catch (error) {
       this.message.set(error instanceof Error ? error.message : 'No se pudo cerrar sesión.');

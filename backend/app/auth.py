@@ -246,7 +246,7 @@ def request_otp(body: EmailBody, request: Request):
             )
             try:
                 send_code(email, code)
-            except OSError, smtplib.SMTPException:
+            except (OSError, smtplib.SMTPException):
                 conn.execute(
                     update(m.desafio_otp)
                     .where(m.desafio_otp.c.id == challenge)

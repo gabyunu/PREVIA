@@ -1,0 +1,5 @@
+# Flask is the final-project WSGI server. FastAPI is temporarily retained
+# solely for compatibility with proven domain handlers and legacy tests.
+-r requirements.lock
+Flask>=3.1,<4
+Flask-SQLAlchemy>=3.1,<4
