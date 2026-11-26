@@ -1,28 +1,33 @@
 <a class="skip-link" href="#acceso">Saltar al formulario</a>
 <header>
-  <div class="welcome">Acceso a PREVIA</div>
-  <div class="utilities"><span>Planificación de la demanda académica</span></div>
-  <div class="brand">PREVIA<span>Tu intención cuenta para planificar</span></div>
+  <div class="welcome">Acceso a PREVIA <span class="role-pill">{{ mode === 'administrador' ? 'ADMINISTRACIÓN' : 'ESTUDIANTE' }}</span></div>
+  <div class="brand">PREVIA<span>Planificación de la demanda académica</span></div>
   <nav aria-label="Navegación principal">
     <button routerLink="/">Inicio</button>
-    <button routerLink="/iniciar-sesion" routerLinkActive="active" ariaCurrentWhenActive="page">
-      Iniciar sesión
-    </button>
-    <button routerLink="/crear-cuenta" routerLinkActive="active" ariaCurrentWhenActive="page">
-      Crear cuenta
-    </button>
+    <button routerLink="/acceso-estudiante" routerLinkActive="active" ariaCurrentWhenActive="page">Estudiante</button>
+    <button routerLink="/acceso-administrador" routerLinkActive="active" ariaCurrentWhenActive="page">Administrador</button>
   </nav>
 </header>
 <div class="subnav">
-  <span class="auth-caption">Acceso por correo institucional · sin contraseña</span>
+  <span class="auth-caption">{{ mode === 'administrador' ? 'Acceso restringido a cuentas con rol administrador' : 'Acceso personal al perfil y las solicitudes' }} · OTP por correo</span>
 </div>
 <div class="auth-layout">
   <aside aria-label="Acceso por correo">
-    <h1 id="acceso" tabindex="-1">{{ registration ? 'Crear cuenta' : 'Iniciar sesión' }}</h1>
-    <app-auth-form [registration]="registration" />
+    <h1 id="acceso" tabindex="-1">{{ mode === 'administrador' ? 'Acceso administrador' : 'Acceso estudiante' }}</h1>
+    <app-auth-form [mode]="mode" />
   </aside>
-  <main><app-auth-presentation /></main>
+  <main>
+    @if (mode === 'administrador') {
+      <div class="login-intro">
+        <p class="eyebrow">ACCESO ADMINISTRATIVO</p>
+        <h2>Gestión de demanda académica</h2>
+        <p>Consulta estadísticas agregadas de solicitudes enviadas, exporta reportes y actualiza parámetros orientativos mediante operaciones CRUD en MySQL.</p>
+        <div class="notice">El registro público nunca otorga permisos de administración. Esta cuenta debe prepararse previamente mediante el script local de pruebas.</div>
+        <p><a routerLink="/acceso-estudiante">¿Quieres registrar tus asignaturas? Entra como estudiante.</a></p>
+      </div>
+    } @else {
+      <app-auth-presentation />
+    }
+  </main>
 </div>
-<footer>
-  PREVIA · Planificación de la Demanda Académica · Acceso local de prueba · correo en Mailpit
-</footer>
+<footer>PREVIA · Demostración académica · Códigos temporales en Mailpit</footer>

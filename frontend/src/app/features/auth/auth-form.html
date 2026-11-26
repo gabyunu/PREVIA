@@ -1,75 +1,44 @@
 <div class="form-content">
-  <p>
-    {{
-      registration()
-        ? 'Registro exclusivo para estudiantes.'
-        : 'Accede con tu correo institucional.'
-    }}
-  </p>
-  <p id="api-note" class="availability">
-    <strong>Acceso local de prueba.</strong> Los códigos se reciben únicamente en Mailpit.
-  </p>
+  <p>{{ mode() === 'administrador' ? 'Solo el personal con rol administrador puede acceder a los reportes y a la planificación.' : 'Tu cuenta te permitirá gestionar únicamente tu propio perfil y solicitudes.' }}</p>
+  <div class="demo-identity" role="note">
+    <strong>Cuenta de prueba · {{ mode() === 'administrador' ? 'administrador' : 'estudiante' }}</strong>
+    <code>{{ mode() === 'administrador' ? adminDemo : studentDemo }}</code>
+    <button type="button" (click)="email = mode() === 'administrador' ? adminDemo : studentDemo">Usar este correo</button>
+    <small>Sin contraseña fija. El código OTP cambia en cada ingreso.</small>
+  </div>
+  <p id="api-note" class="availability">Los códigos se reciben únicamente en <a href="http://127.0.0.1:8025" target="_blank" rel="noopener noreferrer">Mailpit (abrir correo local)</a>.</p>
   @if (!otpPreview()) {
     <form #emailForm="ngForm" (ngSubmit)="requestCode()">
-      <label for="institutional-email">Correo institucional</label>
-      <input
-        id="institutional-email"
-        name="email"
-        type="email"
-        autocomplete="email"
-        required
-        email
-        [(ngModel)]="email"
-        #emailField="ngModel"
-        aria-describedby="email-help api-note"
-      />
-      <p id="email-help" class="help">
-        Usa una cuenta ficticia, por ejemplo estudiante@estudiantes.example.test. Los dominios
-        oficiales siguen pendientes.
-      </p>
+      <label for="institutional-email">Correo electrónico de prueba</label>
+      <input id="institutional-email" name="email" type="email" autocomplete="email" required email
+        [(ngModel)]="email" #emailField="ngModel" aria-describedby="email-help api-note" />
+      <p id="email-help" class="help">Dominio ficticio autorizado: estudiantes.example.test.</p>
       @if (emailField.invalid && (emailField.dirty || emailField.touched)) {
         <p class="field-error" role="alert">Introduce un correo electrónico válido.</p>
       }
-      <button type="submit" [disabled]="emailForm.invalid || busy()">Solicitar código</button>
+      <button type="submit" [disabled]="emailForm.invalid || busy()">Solicitar código de acceso</button>
     </form>
   } @else {
     <h2>Paso 2 · Código por correo</h2>
-    <p>Introduce el código recibido en Mailpit para el correo indicado.</p>
+    <p>Introduce el código de ocho dígitos recibido en Mailpit para <strong>{{ email }}</strong>.</p>
     <form #otpForm="ngForm" (ngSubmit)="verifyCode()">
-      <label for="otp-code">Código de un solo uso</label>
-      <input
-        id="otp-code"
-        name="code"
-        type="text"
-        autocomplete="one-time-code"
-        inputmode="numeric"
-        pattern="[0-9]{8}"
-        minlength="8"
-        maxlength="8"
-        required
-        [(ngModel)]="code"
-        aria-describedby="otp-help api-note"
-      />
-      <p id="otp-help" class="help">
-        Código de 8 dígitos, válido por 10 minutos con la configuración local predeterminada. Un
-        reenvío invalida el anterior.
-      </p>
-      <button type="submit" [disabled]="otpForm.invalid || busy()">Verificar código</button>
-      <button class="preview-link" type="button" [disabled]="busy()" (click)="requestCode()">
-        Solicitar otro código
-      </button>
+      <label for="otp-code">Código temporal</label>
+      <input id="otp-code" name="code" type="text" autocomplete="one-time-code" inputmode="numeric"
+        pattern="[0-9]{8}" minlength="8" maxlength="8" required [(ngModel)]="code"
+        aria-describedby="otp-help api-note" />
+      <p id="otp-help" class="help">Un código dura 10 minutos de forma predeterminada. Solicitar otro invalida el anterior.</p>
+      <button type="submit" [disabled]="otpForm.invalid || busy()">Entrar a mi espacio</button>
+      <button class="preview-link" type="button" [disabled]="busy()" (click)="requestCode()">Solicitar otro código</button>
     </form>
-    <button class="preview-link" type="button" [disabled]="busy()" (click)="back()">
-      ▸ Volver al correo
-    </button>
+    <button class="preview-link" type="button" [disabled]="busy()" (click)="back()">Volver al correo</button>
   }
   <p class="feedback" role="status" aria-live="polite">{{ message() }}</p>
   <div class="form-links">
-    @if (registration()) {
-      <a routerLink="/iniciar-sesion">▸ Ya tengo cuenta</a>
+    <a routerLink="/">Volver al inicio</a>
+    @if (mode() === 'administrador') {
+      <a routerLink="/acceso-estudiante">Cambiar a acceso estudiante</a>
     } @else {
-      <a routerLink="/crear-cuenta">▸ Crear cuenta de estudiante</a>
+      <a routerLink="/acceso-administrador">Acceso administrador</a>
     }
-    <a routerLink="/">▸ Volver a Inicio</a>
   </div>
 </div>
